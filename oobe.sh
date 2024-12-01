@@ -28,5 +28,3 @@ while true; do
     fi
   fi
 done
-
-
