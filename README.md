@@ -26,7 +26,7 @@ docker rm wsl_export
   
 In your windows filesystem at `C:\Temp` should be a file `clab.tar`, change the extension to `.wsl`. 
 
-As of WSL 2.2.4 you can either doubleclick the file, or from powershell type
+As of [WSL 2.4.4](https://github.com/microsoft/WSL/releases/tag/2.4.4) you can either doubleclick the file, or from powershell type
 
 ```powershell
 wsl --install --from-file clab.wsl
