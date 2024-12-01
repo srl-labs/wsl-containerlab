@@ -57,5 +57,6 @@ COPY --chown=clab:clab ./zsh/.zshrc /home/clab/.zshrc
 COPY --chown=clab:clab ./zsh/.p10k.zsh /home/clab/.p10k.zsh
 COPY --chown=clab:clab ./zsh/install-zsh-plugins.sh /tmp/install-zsh-plugins.sh
 COPY --chown=clab:clab ./zsh/install-tools-completions.sh /tmp/install-tools-completions.sh
+RUN chmod +x /tmp/install-zsh-plugins.sh /tmp/install-tools-completions.sh
 USER clab
 RUN bash -c "/tmp/install-zsh-plugins.sh && /tmp/install-tools-completions.sh"
