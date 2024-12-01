@@ -2,7 +2,7 @@
 
 set -ue
 
-DEFAULT_GROUPS='adm,cdrom,sudo,dip,plugdev'
+DEFAULT_GROUPS='adm,cdrom,sudo,dip,plugdev,docker'
 DEFAULT_UID='1000'
 
 echo 'Please create a default UNIX user account. The username does not need to match your Windows username.'
