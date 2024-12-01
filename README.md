@@ -32,6 +32,8 @@ As of WSL 2.2.4 you can either doubleclick the file, or from powershell type
 wsl --install --from-file clab.wsl
 ```
 
+### Enter the distro with `wsl -d clabWSL`
+
 # Sources
 
 https://learn.microsoft.com/en-us/windows/wsl/use-custom-distro#export-the-tar-from-a-container
