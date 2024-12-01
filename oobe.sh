@@ -2,31 +2,16 @@
 
 set -ue
 
-DEFAULT_GROUPS='adm,cdrom,sudo,dip,plugdev,docker'
 DEFAULT_UID='1000'
 
-echo 'Please create a default UNIX user account. The username does not need to match your Windows username.'
-echo 'For more information visit: https://aka.ms/wslusers'
-
+# We know the user clab exists from Dockerfile with UID 1000
 if getent passwd "$DEFAULT_UID" > /dev/null ; then
-  echo 'User account already exists, skipping creation'
-  exit 0
+    echo 'User account clab already exists, skipping creation'
+    exit 0
 fi
 
-while true; do
-
-  # Prompt from the username
-  read -p 'Enter new UNIX username: ' username
-
-  # Create the user
-  if /usr/sbin/adduser --uid "$DEFAULT_UID" --quiet --gecos ''  "$username"; then
-
-    if /usr/sbin/usermod "$username" -aG "$DEFAULT_GROUPS"; then
-      break
-    else
-      /usr/sbin/deluser "$username"
-    fi
-  fi
-done
-
-
+# This part will never be reached since clab user exists,
+# but keeping it as a fallback
+echo 'Please create a default UNIX user account. The username does not need to match your Windows username.'
+echo 'For more information visit: https://aka.ms/wslusers'
+exit 1
