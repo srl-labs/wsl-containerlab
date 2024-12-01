@@ -32,7 +32,11 @@ As of WSL 2.2.4 you can either doubleclick the file, or from powershell type
 wsl --install --from-file clab.wsl
 ```
 
-### Enter the distro with `wsl -d clabWSL`
+# Usage of the distro
+
+Enter the distro with `wsl -d clabWSL`
+
+Uninstall with `wsl --unregister clabWSL`
 
 # Sources
 
