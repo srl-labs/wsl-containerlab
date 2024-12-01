@@ -47,6 +47,5 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: clab.wsl
-          asset_name: clab.wsl
-          asset_content_type: application/octet-stream
+          asset_name: clab-${{ github.ref_name }}.wsl
           tag: ${{ github.ref }}
