@@ -1,4 +1,4 @@
-from debian:bookworm-slim
+FROM debian:bookworm-slim
 
 RUN apt update -y && apt upgrade -y
 RUN apt install git curl sudo -y && rm -rf /var/lib/apt/lists/*
