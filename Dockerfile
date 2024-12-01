@@ -18,7 +18,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     dnsutils \
     telnet \
     curl \
-    zsh
+    zsh \
+    wget 
 
 
 COPY --chmod=644 --chown=root:root ./wsl-distribution.conf /etc/wsl-distribution.conf
