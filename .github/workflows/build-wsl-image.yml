@@ -1,0 +1,52 @@
+name: Build and Publish WSL2 Image
+
+on:
+  release:
+    types: [created]
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker Image
+        run: |
+          docker build . --tag clab-wsl-debian
+
+      - name: Run Docker Container and Export Filesystem
+        run: |
+          # Run the Docker container
+          docker run -t --name wsl_export clab-wsl-debian ls /
+          # Export the container's filesystem to a tar file
+          docker export wsl_export -o clab.tar
+          # Remove the container to clean up
+          docker rm wsl_export
+
+      - name: Rename tar to .wsl file
+        run: |
+          # Rename the tar file to have a .wsl extension
+          mv clab.tar clab.wsl
+
+      - name: Upload WSL Image Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: clab-wsl2
+          path: clab.wsl
+
+      - name: Upload Release Asset
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: clab.wsl
+          asset_name: clab.wsl
+          asset_content_type: application/octet-stream
+          tag: ${{ github.ref }}
