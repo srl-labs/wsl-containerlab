@@ -12,7 +12,7 @@
 
 ```bash
 docker run -t --name wsl_export ghcr.io/kaelemc/clab-wsl-debian ls /
-docker export wsl_export > /mnt/c/temp/clab.tar
+docker export wsl_export > /mnt/c/temp/clab.wsl
 ```
 
 > Create the 'temp' directory on your C: drive if it doesn't exist.
@@ -24,7 +24,7 @@ docker rm wsl_export
 
 3. Use it
   
-In your windows filesystem at `C:\Temp` should be a file `clab.tar`, change the extension to `.wsl`. 
+In your windows filesystem at `C:\Temp` should be a file `clab.tar`, ensure the extension is `.wsl`. 
 
 As of [WSL 2.4.4](https://github.com/microsoft/WSL/releases/tag/2.4.4) you can either doubleclick the file, or from powershell type
 
