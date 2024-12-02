@@ -1,14 +1,13 @@
 FROM debian:bookworm-slim
 
 RUN apt update -y && apt upgrade -y
-RUN apt install git curl sudo -y && rm -rf /var/lib/apt/lists/*
+RUN apt install -y \
+    git \
+    curl \
+    sudo \
+    wget 
 
-# Add the netdevops repository
-RUN echo "deb [trusted=yes] https://netdevops.fury.site/apt/ /" | \
-    tee -a /etc/apt/sources.list.d/netdevops.list
-
-# Install necessary packages, including curl
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt install -y  --no-install-recommends \
     direnv \
     btop \
     iputils-ping \
@@ -17,10 +16,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     qemu-kvm \
     dnsutils \
     telnet \
-    curl \
-    zsh \
-    wget 
+    zsh && rm -rf /var/lib/apt/lists/*
 
+# Add the netdevops repository
+RUN echo "deb [trusted=yes] https://netdevops.fury.site/apt/ /" | \
+    tee -a /etc/apt/sources.list.d/netdevops.list
 
 COPY --chmod=644 --chown=root:root ./wsl-distribution.conf /etc/wsl-distribution.conf
 COPY --chmod=644 --chown=root:root ./wsl.conf /etc/wsl.conf
