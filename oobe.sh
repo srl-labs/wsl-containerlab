@@ -4,11 +4,66 @@ set -ue
 
 DEFAULT_UID='1000'
 
+function setup-bash-prompt {
+    # Check if the prompt is already set up
+    if grep -q "function promptcmd" /home/clab/.bashrc; then
+        echo "Bash prompt already configured in .bashrc"
+        return 1
+    fi
+
+    cat << 'EOF' >> /home/clab/.bashrc
+
+# Custom Bash Prompt Configuration
+WHITE='\[\033[1;37m\]'; LIGHTRED='\[\033[1;31m\]'; LIGHTGREEN='\[\033[1;32m\]'; LIGHTBLUE='\[\033[1;34m\]'; DEFAULT='\[\033[0m\]'
+cLINES=$WHITE; cBRACKETS=$WHITE; cERROR=$LIGHTRED; cSUCCESS=$LIGHTGREEN; cHST=$LIGHTGREEN; cPWD=$LIGHTBLUE; cCMD=$DEFAULT
+promptcmd() { 
+    PREVRET=$?
+    PS1="\n"
+    if [ $PREVRET -ne 0 ]; then 
+        PS1="${PS1}${cBRACKETS}[${cERROR}x${cBRACKETS}]${cLINES}\342\224\200"
+    else 
+        PS1="${PS1}${cBRACKETS}[${cSUCCESS}*${cBRACKETS}]${cLINES}\342\224\200"
+    fi
+    PS1="${PS1}${cBRACKETS}[${cHST}\h${cBRACKETS}]${cLINES}\342\224\200"
+    PS1="${PS1}[${cPWD}\w${cBRACKETS}]"
+    PS1="${PS1}\n${cLINES}\342\224\224\342\224\200\342\224\200> ${cCMD}"
+}
+PROMPT_COMMAND=promptcmd
+EOF
+
+}
+
 # We know the user clab exists from Dockerfile with UID 1000
 if getent passwd "$DEFAULT_UID" > /dev/null ; then
+
+    echo -e "\033[32mWelcome to Containerlab's WSL distribution\033[0m\n"
+
+    PS3="Please select which shell you'd like to use: "
+    shell_opts=("zsh" "bash w/ prompt" "bash")
+    select shell in "${shell_opts[@]}"
+    do
+        case $shell in
+            "zsh")
+                echo "zsh selected"
+                break
+                ;;
+            "bash w/ prompt")
+                echo "bash w/ prompt selected. Installing two-line prompt"
+                sudo chsh -s $(which bash) clab
+                setup-bash-prompt
+                break
+                ;;
+            "bash")
+                echo "bash selected"
+                sudo chsh -s $(which bash) clab
+                break
+                ;;
+            *) echo "invalid option $REPLY";;
+        esac
+    done
+
     containerlab version
-    echo -e '\n'
-    echo " Welcome to Containerlab's WSL distribution."
+
     exit 0
 fi
 
