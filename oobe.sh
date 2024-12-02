@@ -38,6 +38,8 @@ if getent passwd "$DEFAULT_UID" > /dev/null ; then
 
     echo -e "\033[32mWelcome to Containerlab's WSL distribution\033[0m"
 
+    echo "cd ~" >> /home/clab/.bashrc
+
     PS3="
 Please select which shell you'd like to use: "
 

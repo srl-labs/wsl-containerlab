@@ -135,3 +135,5 @@ eval "$(pyenv init -)"
 
 # go path
 export PATH=$PATH:/usr/local/go/bin:~/go/bin
+
+cd ~
