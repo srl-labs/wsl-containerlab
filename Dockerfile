@@ -5,7 +5,8 @@ RUN apt install -y \
     git \
     curl \
     sudo \
-    wget 
+    wget \
+    nano
 
 RUN apt install -y  --no-install-recommends \
     direnv \
