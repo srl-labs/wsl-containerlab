@@ -36,7 +36,7 @@ EOF
 # We know the user clab exists from Dockerfile with UID 1000
 if getent passwd "$DEFAULT_UID" > /dev/null ; then
 
-    echo -e "\033[32mWelcome to Containerlab's WSL distribution\033[0m\n"
+    echo -e "\033[32mWelcome to Containerlab's WSL distribution\033[0m"
 
     PS3="
 Please select which shell you'd like to use: "
@@ -46,24 +46,24 @@ Please select which shell you'd like to use: "
     do
         case $shell in
             "zsh")
-                echo "zsh selected"
+                echo -e "\033[34m\nzsh selected\033[0m"
                 sudo chsh -s $(which zsh) clab
                 break
                 ;;
             "bash with two-line prompt")
-                echo "bash with two-line prompt prompt selected. Configuring two-line prompt"
+                echo -e "\033[34m\nbash with two-line prompt prompt selected. Configuring two-line prompt\033[0m"
                 # backup .bashrc
-                cp /home/clab/.bashrc /home/clab/.bashrc.bak
+                sudo -u clab cp /home/clab/.bashrc /home/clab/.bashrc.bak
                 sudo chsh -s $(which bash) clab
                 setup-bash-prompt
                 break
                 ;;
             "bash (default WSL prompt)")
-                echo "bash selected"
+                echo -e "\033[34m\nbash selected\033[0m"
                 sudo chsh -s $(which bash) clab
                 break
                 ;;
-            *) echo -e "invalid option $REPLY\n";;
+            *) echo -e "\033[31m\n'$REPLY' is not a valid choice\033[0m";;
         esac
     done
 
