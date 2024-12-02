@@ -26,6 +26,7 @@ COPY --chmod=644 --chown=root:root ./wsl-distribution.conf /etc/wsl-distribution
 COPY --chmod=644 --chown=root:root ./wsl.conf /etc/wsl.conf
 COPY --chmod=755 ./oobe.sh /etc/oobe.sh
 COPY ./clab_icon.ico /usr/lib/wsl/clab_icon.ico
+COPY ./terminal-profile.json /usr/lib/wsl/terminal-profile.json
 
 # Create clab user and add to sudo group
 RUN useradd -m -s /bin/zsh clab && \
