@@ -2,7 +2,7 @@
 
 Ensure [WSL 2.4.4](https://github.com/microsoft/WSL/releases/tag/2.4.4) is installed.
 
-Clnoe the repo and build use the build script 
+Clone the repo and build using the build script 
 
 ```
 ./build.sh
