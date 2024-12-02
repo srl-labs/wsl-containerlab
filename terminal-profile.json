@@ -3,7 +3,8 @@
       {
         "antialiasingMode": "aliased",
         "fontWeight": "bold",
-        "colorScheme": "Postmodern Tango Light"
+        "colorScheme": "Postmodern Tango Light",
+        "startingDirectory": "\\\\wsl$\\Containerlab\\home\\clab"
       }
     ],
     "schemes": [
