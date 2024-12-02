@@ -1,8 +1,24 @@
 # wsl-clab
 
-# Steps
+Ensure [WSL 2.4.4](https://github.com/microsoft/WSL/releases/tag/2.4.4) is installed.
 
-1. Build the container
+Clnoe the repo and build use the build script 
+
+```
+./build.sh
+```
+
+This will place `clab.wsl` in `C:\temp`. Doubleclick to install the distribution.
+
+- Manual build instructions are below. 
+
+To uninstall execute `wsl --unregister Containerlab` from powershell.
+
+Enter the distribution with `wsl -d Containerlab`
+
+# Manual steps
+
+1. From inside a WSL distro Build the container
 
 ```bash
  docker build . --tag ghcr.io/kaelemc/clab-wsl-debian
@@ -31,12 +47,6 @@ As of [WSL 2.4.4](https://github.com/microsoft/WSL/releases/tag/2.4.4) you can e
 ```powershell
 wsl --install --from-file clab.wsl
 ```
-
-# Usage of the distro
-
-Enter the distro with `wsl -d clabWSL`
-
-Uninstall with `wsl --unregister clabWSL`
 
 # Sources
 
