@@ -45,6 +45,7 @@ if getent passwd "$DEFAULT_UID" > /dev/null ; then
         case $shell in
             "zsh")
                 echo "zsh selected"
+                sudo chsh -s $(which zsh) clab
                 break
                 ;;
             "bash w/ prompt")
