@@ -38,8 +38,10 @@ if getent passwd "$DEFAULT_UID" > /dev/null ; then
 
     echo -e "\033[32mWelcome to Containerlab's WSL distribution\033[0m\n"
 
-    PS3="Please select which shell you'd like to use: "
-    shell_opts=("zsh" "bash w/ prompt" "bash")
+    PS3="
+Please select which shell you'd like to use: "
+
+    shell_opts=("zsh" "bash with two-line prompt" "bash (default WSL prompt)")
     select shell in "${shell_opts[@]}"
     do
         case $shell in
@@ -48,18 +50,20 @@ if getent passwd "$DEFAULT_UID" > /dev/null ; then
                 sudo chsh -s $(which zsh) clab
                 break
                 ;;
-            "bash w/ prompt")
-                echo "bash w/ prompt selected. Installing two-line prompt"
+            "bash with two-line prompt")
+                echo "bash with two-line prompt prompt selected. Configuring two-line prompt"
+                # backup .bashrc
+                cp /home/clab/.bashrc /home/clab/.bashrc.bak
                 sudo chsh -s $(which bash) clab
                 setup-bash-prompt
                 break
                 ;;
-            "bash")
+            "bash (default WSL prompt)")
                 echo "bash selected"
                 sudo chsh -s $(which bash) clab
                 break
                 ;;
-            *) echo "invalid option $REPLY";;
+            *) echo -e "invalid option $REPLY\n";;
         esac
     done
 
