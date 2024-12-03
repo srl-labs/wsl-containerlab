@@ -1,6 +1,6 @@
 # Containerlab WSL
 
-A WSL distribution designed for easy usage with [Containerlab](https://containerlab.dev).
+A WSL distribution designed for easy 'plug and play' usage with [Containerlab](https://containerlab.dev).
 
 > [!IMPORTANT]
 > WSL 2.4.4 is required to use this distribution. It is currently in 
@@ -17,28 +17,60 @@ We recommend using Windows Terminal for the best experience:
 - Windows 11 users: Windows Terminal is installed by default.
 - Windows 10 users: Download Windows Terminal from the [Microsoft Store](https://aka.ms/terminal).
 
+# Quick start
+
+- Download the `.wsl` file from the [releases page](https://github.com/kaelemc/wsl-clab/releases/latest).
+- Double click the `.wsl` file to install.
+- Open 'Containerlab' from the start menu, or execute `wsl -d Containerlab`
+- Complete the interactive shell selection.
+- Done! you can start labbing.
+
 # WSL installation
 
 This distro makes use of WSL2, which requires that virtualization is enabled in your UEFI/BIOS. 
 
 This may appear as something called 'SVM (AMD-V)' or 'Intel VT-x' depending on your processor.
 
-- **On Windows 11**: Open powershell and type:
+**Windows 11**
 
-    ```
-    wsl --install
-    ```
+Open powershell and type:
 
-- **On Windows 10**: Open the optional features dialog, you can do this by opening a run dialog (Win+R) and typing `optionalfeatures`.
+```
+wsl --install
+```
 
-    Scroll to the bottom and enable 'Windows Subsystem for Linux'.
+Restart your PC, and WSL2 should be installed.
 
+**On Windows 10**
 
-# Distro installation
+>[!TIP]
+> On newer versions on Windows 10 you can use `wsl --install` like with Windows 11.
 
-**Ensure WSL is enabled and you have WSL 2.4.4 or newer.**
+**Instructions are from ['Manual installation steps for older versions of WSL'.](https://learn.microsoft.com/en-us/windows/wsl/install-manual)**
 
-Use `wsl --version` to confirm this:
+Open an elevated powershell window (as administrator) and paste the following two commands:
+
+```
+dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+```
+
+```
+dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+```
+
+At this point restart your computer. After it has rebooted download the latest WSL2 kernel. [Download link](https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi).
+
+Follow the installation wizard. After completion finally set WSL2 as the default version of WSL.
+
+In powershell or command prompt paste the following:
+
+```
+wsl --set-default-version 2
+```
+
+## Version check
+
+Run `wsl --version` in powershell or command prompt to ensure WSL2 is enabled. The WSL version number should be 2.4.4.0 or higher.
 
 ```
 PS C:\Users\Kaelem> wsl --version
@@ -51,7 +83,10 @@ DXCore version: 10.0.26100.1-240331-1435.ge-release
 Windows version: 10.0.19044.5131
 ```
 
-## Steps
+# Distro installation
+
+**Ensure WSL is enabled and you have WSL 2.4.4 or newer. See the [version check](#version-check) instructions.**
+
 
 1. Download the `.wsl` file from the [latest release](https://github.com/kaelemc/wsl-clab/releases/latest).
 
