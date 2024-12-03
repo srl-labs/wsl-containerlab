@@ -14,8 +14,8 @@ A WSL distribution designed for easy usage with [Containerlab](https://container
 | Windows 11 |      Yes      |         Yes        |
 
 We recommend using Windows Terminal for the best experience:
-- Windows 11 users: Windows Terminal is installed by default
-- Windows 10 users: Download Windows Terminal from the [Microsoft Store](https://aka.ms/terminal)
+- Windows 11 users: Windows Terminal is installed by default.
+- Windows 10 users: Download Windows Terminal from the [Microsoft Store](https://aka.ms/terminal).
 
 # Installation
 
@@ -48,7 +48,7 @@ This may appear as something called 'SVM (AMD-V)' or 'Intel VT-x' depending on y
 
 3. From the start menu you can launch the distribution from a new 'Containerlab' shortcut which has been added. 
 
-    or in powershell/cmd you can execute 
+    or in powershell/cmd you can execute:
 
     ```
     wsl -d Containerlab
@@ -72,9 +72,9 @@ This may appear as something called 'SVM (AMD-V)' or 'Intel VT-x' depending on y
 
 5. You can open Containerlab WSL in the following ways:
 
-    - From the profile in Windows Terminal (recommended)
-    - From the shortcut in the start menu
-    - Executing `wsl -d Containerlab` in powershell or command prompt
+    - From the profile in Windows Terminal (recommended).
+    - From the shortcut in the start menu.
+    - Executing `wsl -d Containerlab` in powershell or command prompt.
 
 > [!NOTE]
 > Opening WSL via the shortcut or `wsl -d Containerlab` will not
@@ -84,7 +84,7 @@ This may appear as something called 'SVM (AMD-V)' or 'Intel VT-x' depending on y
 # vrnetlab (Nested virtualization)
 
 > [!IMPORTANT]
-> This feature is only supported in Windows 11
+> This feature is only supported on Windows 11.
 
 You can run [vrnetlab (VM-based)](https://github.com/hellt/vrnetlab) nodes ontop of WSL2 and use them in containerlab.
 
@@ -124,13 +124,13 @@ This will place `clab.wsl` in `C:\temp`. Doubleclick to install the distribution
 
 ## Manual steps
 
-1. From inside a WSL distro Build the container
+1. From inside a WSL distro Build the container:
 
 ```bash
  docker build . --tag ghcr.io/kaelemc/clab-wsl-debian
 ```
 
-2. Run it and export the filesystem to a `.wsl.` file
+2. Run it and export the filesystem to a `.wsl.` file:
 
 ```bash
 docker run -t --name wsl_export ghcr.io/kaelemc/clab-wsl-debian ls /
@@ -139,7 +139,7 @@ docker export wsl_export > /mnt/c/temp/clab.wsl
 
 > Create the 'temp' directory on your C: drive if it doesn't exist.
 
-Remove the container to ease rebuilding
+Remove the container to ease rebuilding:
 
 ```bash
 docker rm wsl_export
@@ -155,13 +155,13 @@ wsl --install --from-file clab.wsl
 
 # Uninstallation
 
-Uninstall Containerlab WSL using the following command in powershell/command prompt
+Uninstall Containerlab WSL using the following command in powershell/command prompt:
 
 ```
 wsl --unregister Containerlab
 ```
 
-Ensure uninstallation by checking installed distros
+Ensure uninstallation by checking installed distros:
 
 ```
 wsl -l -v
