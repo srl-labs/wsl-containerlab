@@ -35,7 +35,7 @@ This may appear as something called 'SVM (AMD-V)' or 'Intel VT-x' depending on y
 
 Open powershell and type:
 
-```
+```powershell
 wsl --install
 ```
 
@@ -50,11 +50,11 @@ Restart your PC, and WSL2 should be installed.
 
 Open an elevated powershell window (as administrator) and paste the following two commands:
 
-```
+```powershell
 dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
 ```
 
-```
+```powershell
 dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
 ```
 
@@ -64,7 +64,7 @@ Follow the installation wizard. After completion finally set WSL2 as the default
 
 In powershell or command prompt paste the following:
 
-```
+```powershell
 wsl --set-default-version 2
 ```
 
@@ -72,7 +72,7 @@ wsl --set-default-version 2
 
 Run `wsl --version` in powershell or command prompt to ensure WSL2 is enabled. The WSL version number should be 2.4.4.0 or higher.
 
-```
+```powershell
 PS C:\Users\Kaelem> wsl --version
 WSL version: 2.4.4.0
 Kernel version: 5.15.167.4-1
@@ -98,7 +98,7 @@ Windows version: 10.0.19044.5131
 
     or in powershell/cmd you can execute:
 
-    ```
+    ```powershell
     wsl -d Containerlab
     ```
 
@@ -164,7 +164,7 @@ Development should be performed from another WSL distribution.
 
 Clone the repository and build using the build script (you may have to `chmod +x` the script)
 
-```
+```bash
 ./build.sh
 ```
 
@@ -197,7 +197,7 @@ docker rm wsl_export
   
 In your windows filesystem at `C:\temp` should be a file `clab.wsl`, double click to install. or use:
 
-```
+```powershell
 wsl --install --from-file clab.wsl
 ```
 
@@ -205,13 +205,13 @@ wsl --install --from-file clab.wsl
 
 Uninstall Containerlab WSL using the following command in powershell/command prompt:
 
-```
+```powershell
 wsl --unregister Containerlab
 ```
 
 Ensure uninstallation by checking installed distros:
 
-```
+```powershell
 wsl -l -v
 ```
 
