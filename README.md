@@ -62,13 +62,13 @@ This may appear as something called 'SVM (AMD-V)' or 'Intel VT-x' depending on y
 
     To run the setup again and change prompts, execute `/etc/oobe.sh` inside Containerlab WSL.
 
-    > [!IMPORTANT]
-    > After installation, close and reopen Windows Terminal to ensure 
-    > proper font rendering and appearance settings have been applied 
-    > correctly. 
-    > 
-    > This step is necessary for the terminal to recognize and use the
-    > newly installed WSL distribution's display configurations.
+> [!IMPORTANT]
+> After installation, close and reopen Windows Terminal to ensure 
+> proper font rendering and appearance settings have been applied 
+> correctly. 
+> 
+> This step is necessary for the terminal to recognize and use the
+> newly installed WSL distribution's display configurations.
 
 5. You can open Containerlab WSL in the following ways:
 
@@ -76,10 +76,10 @@ This may appear as something called 'SVM (AMD-V)' or 'Intel VT-x' depending on y
     - From the shortcut in the start menu
     - Executing `wsl -d Containerlab` in powershell or command prompt
 
-    > [!NOTE]
-    > Opening WSL via the shortcut or `wsl -d Containerlab` will not
-    > open in our custom Windows Terminal profile. The customised
-    > appearance settings will not be functional in this case.
+> [!NOTE]
+> Opening WSL via the shortcut or `wsl -d Containerlab` will not
+> open in our custom Windows Terminal profile. The customised
+> appearance settings will not be functional in this case.
 
 # vrnetlab (Nested virtualization)
 
