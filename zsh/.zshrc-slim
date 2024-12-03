@@ -127,3 +127,5 @@ eval "$(atuin init zsh)"
 
 # go path
 export PATH=$PATH:/usr/local/go/bin:~/go/bin
+
+cd ~
