@@ -1,10 +1,12 @@
 {
     "profiles": [
       {
-        "antialiasingMode": "aliased",
-        "fontWeight": "bold",
+        "antialiasingMode": "cleartype",
+        "fontWeight": "normal",
+        "fontFace": "FiraCode Nerd Font, Consolas",
         "colorScheme": "Postmodern Tango Light",
-        "startingDirectory": "\\\\wsl$\\Containerlab\\home\\clab"
+        "startingDirectory": "\\\\wsl$\\Containerlab\\home\\clab",
+        "bellStyle": "none"
       }
     ],
     "schemes": [

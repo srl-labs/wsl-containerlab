@@ -18,11 +18,8 @@ RUN apt install -y  --no-install-recommends \
     qemu-kvm \
     dnsutils \
     telnet \
+    unzip \
     zsh && rm -rf /var/lib/apt/lists/*
-
-# Add the netdevops repository
-RUN echo "deb [trusted=yes] https://netdevops.fury.site/apt/ /" | \
-    tee -a /etc/apt/sources.list.d/netdevops.list
 
 COPY --chmod=644 --chown=root:root ./wsl-distribution.conf /etc/wsl-distribution.conf
 COPY --chmod=644 --chown=root:root ./wsl.conf /etc/wsl.conf

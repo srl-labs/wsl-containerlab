@@ -33,6 +33,54 @@ EOF
 
 }
 
+function install_fonts {
+    echo -e "\033[34m\nInstalling FiraCode Nerd Font...\033[0m"
+
+    # Font name pattern to match any FiraCode Nerd Font variant
+    FONT_NAME_PATTERN='FiraCode Nerd Font*'
+
+    # Check if any FiraCode Nerd Font is already installed using PowerShell
+    FONT_CHECK=$(powershell.exe -NoProfile -Command '
+        Add-Type -AssemblyName System.Drawing
+        $fonts = [System.Drawing.Text.InstalledFontCollection]::new().Families
+        $fontNamePattern = "'"$FONT_NAME_PATTERN"'"
+        $found = $fonts | Where-Object { $_.Name -like $fontNamePattern } | Select-Object -First 1
+        if ($found) { "yes" } else { "no" }
+    ')
+
+    if [[ "$FONT_CHECK" =~ "yes" ]]; then
+        echo -e "\033[33mFiraCode Nerd Font is already installed. Skipping installation.\033[0m"
+    else
+        echo "Downloading FiraCode Nerd Font..."
+        TMP_DIR=$(mktemp -d)
+        cd "$TMP_DIR"
+        curl -fLo "FiraCode.zip" https://github.com/ryanoasis/nerd-fonts/releases/latest/download/FiraCode.zip
+
+        # Unzip the font files
+        unzip -q FiraCode.zip -d FiraCodeNF
+
+        # Convert the path to Windows format
+        FONTS_PATH=$(wslpath -w "$TMP_DIR/FiraCodeNF")
+
+        # Install fonts using PowerShell directly with ExecutionPolicy set to Bypass
+        powershell.exe -NoProfile -ExecutionPolicy Bypass -Command '
+            $fontFiles = Get-ChildItem -Path "'"$FONTS_PATH"'" -Filter "*.ttf"
+            foreach ($fontFile in $fontFiles) {
+                $shellApp = New-Object -ComObject Shell.Application
+                $fontsFolder = $shellApp.NameSpace(0x14)
+                $fontsFolder.CopyHere($fontFile.FullName, 16)
+            }
+        '
+
+        # Clean up
+        cd ~
+        rm -rf "$TMP_DIR"
+
+        echo -e "\033[32mFiraCode Nerd Font installed successfully.\033[0m"
+        echo -e "\033[33mNote: You may need to restart Windows Terminal to see the new fonts in the font selection.\033[0m"
+    fi
+}
+
 # We know the user clab exists from Dockerfile with UID 1000
 if getent passwd "$DEFAULT_UID" > /dev/null ; then
 
@@ -49,27 +97,38 @@ Please select which shell you'd like to use: "
         case $shell in
             "zsh")
                 echo -e "\033[34m\nzsh selected\033[0m"
-                sudo chsh -s $(which zsh) clab
+                echo -e "\033[33mNote: zsh with custom theme requires Nerd Font for proper symbol display\033[0m"
+                read -p "Would you like to install FiraCode Nerd Font? (y/N) " -n 1 -r
+                echo
+                if [[ $REPLY =~ ^[Yy]$ ]]; then
+                    install_fonts
+                fi
+                sudo chsh -s "$(which zsh)" clab
                 break
                 ;;
             "bash with two-line prompt")
-                echo -e "\033[34m\nbash with two-line prompt prompt selected. Configuring two-line prompt\033[0m"
-                # backup .bashrc
+                echo -e "\033[34m\nbash with two-line prompt selected. Configuring two-line prompt\033[0m"
+                read -p "Would you like to install FiraCode Nerd Font? (y/N) " -n 1 -r
+                echo
+                if [[ $REPLY =~ ^[Yy]$ ]]; then
+                    install_fonts
+                fi
+                # Backup .bashrc
                 sudo -u clab cp /home/clab/.bashrc /home/clab/.bashrc.bak
-                sudo chsh -s $(which bash) clab
+                sudo chsh -s "$(which bash)" clab
                 setup-bash-prompt
                 break
                 ;;
             "bash (default WSL prompt)")
                 echo -e "\033[34m\nbash selected\033[0m"
-                sudo chsh -s $(which bash) clab
+                sudo chsh -s "$(which bash)" clab
                 break
                 ;;
             *) echo -e "\033[31m\n'$REPLY' is not a valid choice\033[0m";;
         esac
     done
 
-    containerlab version
+    #containerlab version
 
     exit 0
 fi
