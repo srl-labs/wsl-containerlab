@@ -38,6 +38,21 @@ This may appear as something called 'SVM (AMD-V)' or 'Intel VT-x' depending on y
 
 **Ensure WSL is enabled and you have WSL 2.4.4 or newer.**
 
+Use `wsl --version` to confirm this:
+
+```
+PS C:\Users\Kaelem> wsl --version
+WSL version: 2.4.4.0
+Kernel version: 5.15.167.4-1
+WSLg version: 1.0.65
+MSRDC version: 1.2.5620
+Direct3D version: 1.611.1-81528511
+DXCore version: 10.0.26100.1-240331-1435.ge-release
+Windows version: 10.0.19044.5131
+```
+
+## Steps
+
 1. Download the `.wsl` file from the [latest release](https://github.com/kaelemc/wsl-clab/releases/latest).
 
 2. Double click the `.wsl` file. This will install the distribution.
