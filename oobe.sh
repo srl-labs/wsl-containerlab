@@ -98,11 +98,42 @@ Please select which shell you'd like to use: "
             "zsh")
                 echo -e "\033[34m\nzsh selected\033[0m"
                 echo -e "\033[33mNote: zsh with custom theme requires Nerd Font for proper symbol display\033[0m"
-                read -p "Would you like to install FiraCode Nerd Font? (y/N) " -n 1 -r
-                echo
-                if [[ $REPLY =~ ^[Yy]$ ]]; then
-                    install_fonts
-                fi
+                
+                PS3="
+Select zsh configuration: "
+                zsh_opts=("Full featured (many plugins)" "Lean version (minimal plugins)")
+                select zsh_config in "${zsh_opts[@]}"
+                do
+                    case $zsh_config in
+                        "Full featured (many plugins)")
+                            echo -e "\033[34m\nConfiguring full featured zsh\033[0m"
+                            read -p "Would you like to install FiraCode Nerd Font? (y/N) " -n 1 -r
+                            echo
+                            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                                install_fonts
+                            fi
+                            # Use default .zshrc and .p10k.zsh
+                            sudo -u clab cp /home/clab/.zshrc{,.bak}
+                            sudo -u clab cp /home/clab/.p10k.zsh{,.bak}
+                            break 2
+                            ;;
+                        "Lean version (minimal plugins)")
+                            echo -e "\033[34m\nConfiguring lean zsh\033[0m"
+                            read -p "Would you like to install FiraCode Nerd Font? (y/N) " -n 1 -r
+                            echo
+                            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                                install_fonts
+                            fi
+                            # Use lean versions
+                            sudo -u clab cp /home/clab/.zshrc{,.bak}
+                            sudo -u clab cp /home/clab/.p10k.zsh{,.bak}
+                            sudo -u clab cp /home/clab/.zshrc-lean /home/clab/.zshrc
+                            sudo -u clab cp /home/clab/.p10k-lean.zsh /home/clab/.p10k.zsh
+                            break 2
+                            ;;
+                        *) echo -e "\033[31m\n'$REPLY' is not a valid choice\033[0m";;
+                    esac
+                done
                 sudo chsh -s "$(which zsh)" clab
                 break
                 ;;
@@ -127,8 +158,6 @@ Please select which shell you'd like to use: "
             *) echo -e "\033[31m\n'$REPLY' is not a valid choice\033[0m";;
         esac
     done
-
-    #containerlab version
 
     exit 0
 fi

@@ -55,6 +55,8 @@ RUN bash -c "$(curl https://pyenv.run)"
 RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 
 COPY --chown=clab:clab ./zsh/.zshrc /home/clab/.zshrc
+COPY --chown=clab:clab ./zsh/.p10k-lean.zsh /home/clab/.p10k-lean.zsh
+COPY --chown=clab:clab ./zsh/.zshrc-lean /home/clab/.zshrc-lean
 COPY --chown=clab:clab ./zsh/.p10k.zsh /home/clab/.p10k.zsh
 COPY --chown=clab:clab ./zsh/install-zsh-plugins.sh /tmp/install-zsh-plugins.sh
 COPY --chown=clab:clab ./zsh/install-tools-completions.sh /tmp/install-tools-completions.sh
