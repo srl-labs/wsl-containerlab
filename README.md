@@ -2,7 +2,7 @@
 
 Ensure [WSL 2.4.4](https://github.com/microsoft/WSL/releases/tag/2.4.4) is installed.
 
-Clone the repo and build using the build script 
+Clnoe the repo and build use the build script 
 
 ```
 ./build.sh
@@ -47,6 +47,15 @@ As of [WSL 2.4.4](https://github.com/microsoft/WSL/releases/tag/2.4.4) you can e
 ```powershell
 wsl --install --from-file clab.wsl
 ```
+
+After installation, close and reopen your terminal to ensure proper font rendering and appearance settings are applied correctly. This step is necessary for the terminal to recognize and use the newly installed WSL distribution's display configurations.
+
+We recommend using Windows Terminal for the best experience:
+- Windows 11 users: Windows Terminal is installed by default
+- Windows 10 users: Download Windows Terminal from the Microsoft Store: [Terminal](https://aka.ms/terminal)
+
+
+
 
 # Sources
 

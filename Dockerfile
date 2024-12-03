@@ -7,6 +7,7 @@ RUN apt install -y \
     sudo \
     wget \
     nano \
+    vim \
     jq
 
 RUN apt install -y  --no-install-recommends \
@@ -43,7 +44,12 @@ ENV USER=clab
 USER clab
 WORKDIR /home/clab
 
+# Install Containerlab
 RUN curl -sL https://containerlab.dev/setup | sudo -E bash -s "all"
+
+# Install gNMIc and gNOIc
+RUN bash -c "$(curl -sL https://get-gnmic.openconfig.net)" && \
+    bash -c "$(curl -sL https://get-gnoic.kmrd.dev)"
 
 # Create SSH key for vscode user to enable passwordless SSH to devices
 RUN ssh-keygen -t ecdsa -b 256 -N "" -f ~/.ssh/id_ecdsa
@@ -61,5 +67,4 @@ COPY --chown=clab:clab ./zsh/.p10k.zsh /home/clab/.p10k.zsh
 COPY --chown=clab:clab ./zsh/install-zsh-plugins.sh /tmp/install-zsh-plugins.sh
 COPY --chown=clab:clab ./zsh/install-tools-completions.sh /tmp/install-tools-completions.sh
 RUN chmod +x /tmp/install-zsh-plugins.sh /tmp/install-tools-completions.sh
-USER clab
 RUN bash -c "/tmp/install-zsh-plugins.sh && /tmp/install-tools-completions.sh"
