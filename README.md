@@ -17,26 +17,24 @@ We recommend using Windows Terminal for the best experience:
 - Windows 11 users: Windows Terminal is installed by default.
 - Windows 10 users: Download Windows Terminal from the [Microsoft Store](https://aka.ms/terminal).
 
-# Installation
-
-## WSL installation
+# WSL installation
 
 This distro makes use of WSL2, which requires that virtualization is enabled in your UEFI/BIOS. 
 
 This may appear as something called 'SVM (AMD-V)' or 'Intel VT-x' depending on your processor.
 
-- On Windows 11: Open powershell and type:
+- **On Windows 11**: Open powershell and type:
 
     ```
     wsl --install
     ```
 
-- On Windows 10: Open the optional features dialog, you can do this by opening a run dialog (Win+R) and typing `optionalfeatures`.
+- **On Windows 10**: Open the optional features dialog, you can do this by opening a run dialog (Win+R) and typing `optionalfeatures`.
 
-    Scroll to the bottom and enable 'Windows Subsystem for Linux'
+    Scroll to the bottom and enable 'Windows Subsystem for Linux'.
 
 
-## Distro installation
+# Distro installation
 
 **Ensure WSL is enabled and you have WSL 2.4.4 or newer.**
 
