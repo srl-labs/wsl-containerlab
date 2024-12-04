@@ -31,7 +31,7 @@ This distro makes use of WSL2, which requires that virtualization is enabled in 
 
 This may appear as something called 'SVM (AMD-V)' or 'Intel VT-x' depending on your processor.
 
-**Windows 11**
+### Windows 11
 
 Open powershell and type:
 
@@ -41,10 +41,10 @@ wsl --install
 
 Restart your PC, and WSL2 should be installed.
 
-**On Windows 10**
+### Windows 10
 
 >[!TIP]
-> On newer versions on Windows 10 you can use `wsl --install` like with Windows 11.
+> Newer versions of Windows 10 allow to use `wsl --install`  just like with Windows 11.
 
 **Instructions are from ['Manual installation steps for older versions of WSL'.](https://learn.microsoft.com/en-us/windows/wsl/install-manual)**
 
