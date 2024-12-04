@@ -28,6 +28,8 @@ COPY --chmod=755 ./oobe.sh /etc/oobe.sh
 COPY ./clab_icon.ico /usr/lib/wsl/clab_icon.ico
 COPY ./terminal-profile.json /usr/lib/wsl/terminal-profile.json
 
+COPY ./profile /etc/profile
+
 # Create clab user and add to sudo group
 RUN useradd -m -s /bin/zsh clab && \
     echo "clab:clab" | chpasswd && \
