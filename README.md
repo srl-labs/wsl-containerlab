@@ -29,6 +29,9 @@ We recommend using Windows Terminal for the best experience:
 - If you have Docker Desktop installed. See [Docker Desktop](#docker-desktop).
 - Done! you can start labbing.
 
+>[!NOTE]
+> Default credentials are `clab:clab`
+
 # WSL installation
 
 This distro makes use of WSL2, which requires that virtualization is enabled in your UEFI/BIOS. 
