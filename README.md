@@ -134,17 +134,15 @@ Windows version: 10.0.19044.5131
 > [!IMPORTANT]
 > This feature is only supported on Windows 11.
 
-You can run [vrnetlab (VM-based)](https://github.com/hellt/vrnetlab) nodes ontop of WSL2 and use them in containerlab.
+You can run [vrnetlab (VM-based)](https://github.com/hellt/vrnetlab) nodes ontop of WSL2 and use them in containerlab. Containerlab WSL is already configured so that nested virtualisation is enabled on the distro side.
 
-Containerlab WSL is already configured so that nested virtualisation is enabled on the distro side.
+To use vrnetlab nodes on Containerlab WSL you must <u>ensure that nested virtualization is enabled globally in WSL</u>. 
 
-Ensure that nested virtualization is enabled globally for WSL. 
+- You can do this by opening the *'WSL Settings'* app, going to the *'Optional features'* tab and ensuring *'Enable nested virtualization'* is enabled.
+  
+  If you don't get any errors during installation or distro bootup saying that 'Nested virtualization is not supported on this machine.' You should be good to go.
 
-You can do this by opening the *'WSL Settings'* app, going to the *'Optional features'* tab and ensuring *'Enable nested virtualization'* is enabled.
-
-If you don't get any errors during installation or distro bootup saying that 'Nested virtualization is not supported on this machine.' You should be good to go.
-
-See the [containerlab user manual](https://containerlab.dev/manual/vrnetlab/) for more information.
+See the [containerlab user manual](https://containerlab.dev/manual/vrnetlab/) for more information about vrnetlab.
 
 # Performance tuning
 
