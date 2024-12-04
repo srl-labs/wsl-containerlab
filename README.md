@@ -8,6 +8,7 @@ A WSL distribution designed for easy 'plug and play' usage with [Containerlab](h
 >
 > [Download](https://github.com/microsoft/WSL/releases/tag/2.4.4)
 
+
 |   **OS**   | **Supported** | **VM-based NOSes** |
 |:----------:|---------------|--------------------|
 | Windows 10 |      Yes      |         No         |
@@ -19,10 +20,13 @@ We recommend using Windows Terminal for the best experience:
 
 # Quick start
 
+**Ensure WSL2.4.4 or newer is installed.**
+
 - Download the `.wsl` file from the [releases page](https://github.com/kaelemc/wsl-clab/releases/latest).
 - Double click the `.wsl` file to install.
 - Open 'Containerlab' from the start menu, or execute `wsl -d Containerlab`
 - Complete the interactive shell selection.
+- If you have Docker Desktop installed. See [Docker Desktop](#docker-desktop).
 - Done! you can start labbing.
 
 # WSL installation
@@ -155,6 +159,16 @@ WSL2 runs as a VM. By default allocated resources are:
 | Disk         | 1Tb                  | Regardless of disk size, the WSL VM will have a VHD with a maximum size of 1Tb. The disk is thin/sparse provisioned. |
 
 Despite the fairly generous resource allocation by default. WSL2 will not use 100% of the assigned resources.
+
+# Docker desktop
+
+If you have Docker desktop installed. You **must** ensure the integration with the Containerlab WSL distro is disabled, otherwise Containerlab will not work inside Containerlab WSL.
+
+1. Open Docker Desktop window and go to settings (gear icon on the title bar)
+2. Under the 'Resources tab, enter the 'WSL integration' page
+3. Ensure 'Containerlab' has integration disabled
+
+![](./images/docker_desktop_integration.png)
 
 # Developers
 
