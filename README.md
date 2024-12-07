@@ -25,9 +25,9 @@ We recommend using Windows Terminal for the best experience:
 - Download the `.wsl` file from the [releases page](https://github.com/kaelemc/wsl-clab/releases/latest).
 - Double click the `.wsl` file to install.
 - Open 'Containerlab' from the start menu, or execute `wsl -d Containerlab`
-- Complete the interactive shell selection.
+- Complete the interactive shell selection. (if you plan to use [DevPod](#devpod), select `y` for SSH key copy).
 - If you have Docker Desktop installed. See [Docker Desktop](#docker-desktop).
-- Done! you can start labbing.
+- Done! you can start labbing. (see [DevPod](#devpod) for a great way to lab).
 
 >[!NOTE]
 > Default credentials are `clab:clab`
@@ -51,7 +51,7 @@ Restart your PC, and WSL2 should be installed.
 ### Windows 10
 
 >[!TIP]
-> Newer versions of Windows 10 allow to use `wsl --install`  just like with Windows 11.
+> Newer versions of Windows 10 allow usage of `wsl --install`, just like with Windows 11.
 
 **Instructions are from ['Manual installation steps for older versions of WSL'.](https://learn.microsoft.com/en-us/windows/wsl/install-manual)**
 
@@ -115,7 +115,11 @@ Windows version: 10.0.19044.5131
 
     You will also be presented with the choice to have the Fira Code [nerd font](https://www.nerdfonts.com/font-downloads) automatically installed on your system. **We recommend you install this font (especially if using `zsh` as your shell of choice)**.
 
-    To run the setup again and change prompts, execute `/etc/oobe.sh` inside Containerlab WSL.
+    Finally you'll be asked if you want to copy your Windows SSH keys into WSL Containerlab, this is to enable passwordless SSH access. This is an integral step for [DevPod](#devpod) usage, while the default might be **not** to, we recommed you enter `y` (Yes).
+
+    If no SSH keys are found on your machine, an RSA keypair will be automatically generated.
+
+    To run the setup again, execute `/etc/oobe.sh` inside Containerlab WSL.
 
 > [!IMPORTANT]
 > After installation, close and reopen Windows Terminal to ensure 
@@ -172,6 +176,34 @@ If you have Docker desktop installed. You **must** ensure the integration with t
 3. Ensure 'Containerlab' has integration disabled
 
 ![](./images/docker_desktop_integration.png)
+
+# DevPod
+
+[DevPod](https://devpod.sh/) is an awesome tool which can let us easily run labs which take advantage of Devcontainers, which overall can give a 'one-click' lab experience. It's like running the codespaces labs but on your local machine.
+
+Check out [this video](https://www.youtube.com/watch?v=ceDrFx2K3jE) for more info.
+
+Containerlab WSL was designed to support this lab experience out of the box. Just remember the following considerations.
+
+- At the Containerlab WSL setup prompt, make sure you select `Y` to copy your Windows SSH keys into WSL. If you don't have SSH keys, they will be automatically generated for you.
+
+> [!TIP]
+> If you are already past setup, and have selected `N`, Don't worry. From inside Containerlab WSL execute `/etc/oobe.sh` and you can follow the interactive prompts again. It is not recommended to change your shell selection.
+
+- When using DevPod, ensure Containerlab WSL is started (it does **not** automatically launch on Windows startup), you should leave the terminal window with Containerlab WSL open in the background.
+
+A one-time configuration step is required. You must setup a provider in DevPod. For Containerlab WSL, create the **SSH** provider with the following values:
+
+| Field | Value            |
+|-------|------------------|
+| Host  | `clab@localhost` |
+| Port  | `2222`           |
+
+You can leave the other settings as the default values. See the screenshot below.
+
+After configuring the provider, you are done! You can now use one-click labs you see with the DevPod button, or configure the lab workspaces yourself.
+
+![](./images/devpod_settings.png)
 
 # Developers
 
