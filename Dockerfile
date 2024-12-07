@@ -20,6 +20,7 @@ RUN apt install -y  --no-install-recommends \
     dnsutils \
     telnet \
     unzip \
+    openssh-server \
     zsh && rm -rf /var/lib/apt/lists/*
 
 COPY --chmod=644 --chown=root:root ./wsl-distribution.conf /etc/wsl-distribution.conf
@@ -29,6 +30,8 @@ COPY ./clab_icon.ico /usr/lib/wsl/clab_icon.ico
 COPY ./terminal-profile.json /usr/lib/wsl/terminal-profile.json
 
 COPY ./profile /etc/profile
+
+RUN bash -c "echo 'port 2222' >> /etc/ssh/sshd_config"
 
 # Create clab user and add to sudo group
 RUN useradd -m -s /bin/zsh clab && \
