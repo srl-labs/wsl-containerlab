@@ -81,12 +81,61 @@ function install_fonts {
     fi
 }
 
+function import_ssh_keys {
+    KEY_CHECK=$(powershell.exe -NoProfile -Command '
+        $key_types = @("rsa", "ecdsa", "ed25519")
+
+        foreach ( $type in $key_types )
+        {
+            if( Test-Path $env:userprofile\.ssh\id_$type.pub )
+            {
+                return $type
+            }
+        }
+        Write-Output False
+    ')
+
+    mkdir -p /home/clab/.ssh
+    
+    case $KEY_CHECK in 
+
+        rsa*)
+            echo -e "\033[32mRSA key found, Copying into Containerlab WSL...\033[0m"
+            KEY=$(powershell.exe -NoProfile -Command 'Get-Content $env:userprofile\.ssh\id_rsa.pub')
+            echo $KEY >> /home/clab/.ssh/authorized_keys
+            ;;
+        ecdsa*)
+            echo -e "\033[32mECDSA key found, Copying into Containerlab WSL...\033[0m"
+            KEY=$(powershell.exe -NoProfile -Command 'Get-Content $env:userprofile\.ssh\id_ecdsa.pub')
+            echo $KEY >> /home/clab/.ssh/authorized_keys
+            ;;
+        ed25519*)
+            echo -e "\033[32mED25519 key found, Copying into Containerlab WSL...\033[0m"
+            KEY=$(powershell.exe -NoProfile -Command 'Get-Content $env:userprofile\.ssh\id_ed25519.pub')
+            echo $KEY >> /home/clab/.ssh/authorized_keys
+            ;;
+        False*)
+            echo -e "\033[34mNo host keys found, Generating RSA key...\033[0m"
+            powershell.exe -NoProfile -Command "ssh-keygen -t rsa -b 4096 -f \$env:userprofile\.ssh\id_rsa -N '\"\"'"
+            KEY=$(powershell.exe -NoProfile -Command 'Get-Content $env:userprofile\.ssh\id_rsa.pub')
+            echo $KEY >> /home/clab/.ssh/authorized_keys
+            # powershell.exe -NoProfile -Command "Get-Content $env:userprofile\.ssh\id_rsa.pub | ssh clab@localhost -p 2222 'mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys'"
+            ;;
+        *)
+            echo "\033[34m\nCouldn't match key type, invoking Powershell may have failed. Create an issue at https://github.com/srl-labs/wsl-containerlab\033[0m"
+    esac
+
+     echo -e "\033[32mKeys successfully copied. You can SSH into Container WSL passwordless with: 'ssh clab@localhost -p 2222'\033[0m"
+}
+
 # We know the user clab exists from Dockerfile with UID 1000
 if getent passwd "$DEFAULT_UID" > /dev/null ; then
 
     echo -e "\033[32mWelcome to Containerlab's WSL distribution\033[0m"
 
     echo "cd ~" >> /home/clab/.bashrc
+    
+    echo "echo clab | sudo -S mkdir -p /run/docker/netns" >> /home/clab/.bashrc
 
     PS3="
 Please select which shell you'd like to use: "
@@ -158,6 +207,12 @@ Select zsh configuration: "
             *) echo -e "\033[31m\n'$REPLY' is not a valid choice\033[0m";;
         esac
     done
+
+    read -p "Copy Windows SSH keys for passwordless SSH access? (y/N) " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        import_ssh_keys
+    fi
 
     exit 0
 fi
