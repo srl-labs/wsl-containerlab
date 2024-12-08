@@ -25,7 +25,7 @@ We recommend using Windows Terminal for the best experience:
 - Download the `.wsl` file from the [releases page](https://github.com/kaelemc/wsl-clab/releases/latest).
 - Double click the `.wsl` file to install.
 - Open 'Containerlab' from the start menu, or execute `wsl -d Containerlab`
-- Complete the interactive shell selection. (if you plan to use [DevPod](#devpod), select `y` for SSH key copy).
+- Complete the interactive shell selection.
 - If you have Docker Desktop installed. See [Docker Desktop](#docker-desktop).
 - Done! you can start labbing. (see [DevPod](#devpod) for a great way to lab).
 
@@ -115,7 +115,7 @@ Windows version: 10.0.19044.5131
 
     You will also be presented with the choice to have the Fira Code [nerd font](https://www.nerdfonts.com/font-downloads) automatically installed on your system. **We recommend you install this font (especially if using `zsh` as your shell of choice)**.
 
-    Finally you'll be asked if you want to copy your Windows SSH keys into WSL Containerlab, this is to enable passwordless SSH access. This is an integral step for [DevPod](#devpod) usage, while the default might be **not** to, we recommed you enter `y` (Yes).
+    Finally at the end SSH keys will be copied from your Windows host into Containerlab WSL to enable passwordless SSH. This is an integral step for [DevPod](#devpod) usage.
 
     If no SSH keys are found on your machine, an RSA keypair will be automatically generated.
 
@@ -183,12 +183,7 @@ If you have Docker desktop installed. You **must** ensure the integration with t
 
 Check out [this video](https://www.youtube.com/watch?v=ceDrFx2K3jE) for more info.
 
-Containerlab WSL was designed to support this lab experience out of the box. Just remember the following considerations.
-
-- At the Containerlab WSL setup prompt, make sure you select `Y` to copy your Windows SSH keys into WSL. If you don't have SSH keys, they will be automatically generated for you.
-
-> [!TIP]
-> If you are already past setup, and have selected `N`, Don't worry. From inside Containerlab WSL execute `/etc/oobe.sh` and you can follow the interactive prompts again. It is not recommended to change your shell selection.
+Containerlab WSL was designed to support this lab experience out of the box. Just remember the following consideration:
 
 - When using DevPod, ensure Containerlab WSL is started (it does **not** automatically launch on Windows startup), you should leave the terminal window with Containerlab WSL open in the background.
 
