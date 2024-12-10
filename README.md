@@ -18,7 +18,7 @@ We recommend using Windows Terminal for the best experience:
 - Windows 11 users: Windows Terminal is installed by default.
 - Windows 10 users: Download Windows Terminal from the [Microsoft Store](https://aka.ms/terminal).
 
-# Quick start
+# Quick Start
 
 **Ensure WSL2.4.4 or newer is installed.**
 
@@ -32,7 +32,7 @@ We recommend using Windows Terminal for the best experience:
 >[!NOTE]
 > Default credentials are `clab:clab`
 
-# WSL installation
+# WSL Installation
 
 This distro makes use of WSL2, which requires that virtualization is enabled in your UEFI/BIOS. 
 
@@ -75,7 +75,7 @@ In PowerShell or command prompt paste the following:
 wsl --set-default-version 2
 ```
 
-## Version check
+## Version Check
 
 Run `wsl --version` in PowerShell or command prompt to ensure WSL2 is enabled. The WSL version number should be 2.4.4.0 or higher.
 
@@ -90,7 +90,7 @@ DXCore version: 10.0.26100.1-240331-1435.ge-release
 Windows version: 10.0.19044.5131
 ```
 
-# Distro installation
+# Distro Installation
 
 **Ensure WSL is enabled and you have WSL 2.4.4 or newer. See the [version check](#version-check) instructions.**
 
@@ -155,7 +155,7 @@ To use vrnetlab nodes on Containerlab WSL you must <u>ensure that nested virtual
 
 See the [containerlab user manual](https://containerlab.dev/manual/vrnetlab/) for more information about vrnetlab.
 
-# Performance tuning
+# Performance Tuning
 
 WSL2 runs as a VM. By default allocated resources are:
 
@@ -167,7 +167,7 @@ WSL2 runs as a VM. By default allocated resources are:
 
 Despite the fairly generous resource allocation by default. WSL2 will not use 100% of the assigned resources.
 
-# Docker desktop
+# Docker Desktop
 
 If you have Docker desktop installed. You **must** ensure the integration with the Containerlab WSL distro is disabled, otherwise Containerlab will not work inside Containerlab WSL.
 
@@ -212,7 +212,7 @@ Clone the repository and build using the build script (you may have to `chmod +x
 
 This will place `clab.wsl` in `C:\temp`. Doubleclick to install the distribution.
 
-## Manual steps
+## Manual Steps
 
 1. From inside a WSL distro Build the container:
 
@@ -257,7 +257,7 @@ Ensure uninstallation by checking installed distros:
 wsl -l -v
 ```
 
-# Reference material
+# Reference Material
 
 * https://learn.microsoft.com/en-us/windows/wsl/use-custom-distro#export-the-tar-from-a-container
 * https://learn.microsoft.com/en-us/windows/wsl/build-custom-distro
