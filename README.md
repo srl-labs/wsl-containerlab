@@ -40,7 +40,7 @@ This may appear as something called 'SVM (AMD-V)' or 'Intel VT-x' depending on y
 
 ### Windows 11
 
-Open powershell and type:
+Open PowerShell and type:
 
 ```powershell
 wsl --install
@@ -55,7 +55,7 @@ Restart your PC, and WSL2 should be installed.
 
 **Instructions are from ['Manual installation steps for older versions of WSL'.](https://learn.microsoft.com/en-us/windows/wsl/install-manual)**
 
-Open an elevated powershell window (as administrator) and paste the following two commands:
+Open an elevated PowerShell window (as administrator) and paste the following two commands:
 
 ```powershell
 dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
@@ -69,7 +69,7 @@ At this point restart your computer. After it has rebooted download the latest W
 
 Follow the installation wizard. After completion finally set WSL2 as the default version of WSL.
 
-In powershell or command prompt paste the following:
+In PowerShell or command prompt paste the following:
 
 ```powershell
 wsl --set-default-version 2
@@ -77,7 +77,7 @@ wsl --set-default-version 2
 
 ## Version check
 
-Run `wsl --version` in powershell or command prompt to ensure WSL2 is enabled. The WSL version number should be 2.4.4.0 or higher.
+Run `wsl --version` in PowerShell or command prompt to ensure WSL2 is enabled. The WSL version number should be 2.4.4.0 or higher.
 
 ```powershell
 PS C:\Users\Kaelem> wsl --version
@@ -103,7 +103,7 @@ Windows version: 10.0.19044.5131
 
 3. From the start menu you can launch the distribution from a new 'Containerlab' shortcut which has been added. 
 
-    or in powershell/cmd you can execute:
+    or in PowerShell/cmd you can execute:
 
     ```powershell
     wsl -d Containerlab
@@ -133,7 +133,7 @@ Windows version: 10.0.19044.5131
 
     - From the profile in Windows Terminal (recommended).
     - From the shortcut in the start menu.
-    - Executing `wsl -d Containerlab` in powershell or command prompt.
+    - Executing `wsl -d Containerlab` in PowerShell or command prompt.
 
 > [!NOTE]
 > Opening WSL via the shortcut or `wsl -d Containerlab` will not
@@ -245,7 +245,7 @@ wsl --install --from-file clab.wsl
 
 # Uninstallation
 
-Uninstall Containerlab WSL using the following command in powershell/command prompt:
+Uninstall Containerlab WSL using the following command in PowerShell/command prompt:
 
 ```powershell
 wsl --unregister Containerlab
