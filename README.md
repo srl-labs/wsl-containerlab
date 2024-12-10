@@ -18,7 +18,7 @@ We recommend using Windows Terminal for the best experience:
 - Windows 11 users: Windows Terminal is installed by default.
 - Windows 10 users: Download Windows Terminal from the [Microsoft Store](https://aka.ms/terminal).
 
-# Quick start
+# Quick Start
 
 **Ensure WSL2.4.4 or newer is installed.**
 
@@ -32,7 +32,7 @@ We recommend using Windows Terminal for the best experience:
 >[!NOTE]
 > Default credentials are `clab:clab`
 
-# WSL installation
+# WSL Installation
 
 This distro makes use of WSL2, which requires that virtualization is enabled in your UEFI/BIOS. 
 
@@ -40,7 +40,7 @@ This may appear as something called 'SVM (AMD-V)' or 'Intel VT-x' depending on y
 
 ### Windows 11
 
-Open powershell and type:
+Open PowerShell and type:
 
 ```powershell
 wsl --install
@@ -55,13 +55,11 @@ Restart your PC, and WSL2 should be installed.
 
 **Instructions are from ['Manual installation steps for older versions of WSL'.](https://learn.microsoft.com/en-us/windows/wsl/install-manual)**
 
-Open an elevated powershell window (as administrator) and paste the following two commands:
+Open an elevated PowerShell window (as administrator) and paste the following two commands:
 
 ```powershell
 dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
-```
 
-```powershell
 dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
 ```
 
@@ -69,15 +67,15 @@ At this point restart your computer. After it has rebooted download the latest W
 
 Follow the installation wizard. After completion finally set WSL2 as the default version of WSL.
 
-In powershell or command prompt paste the following:
+In PowerShell or command prompt paste the following:
 
 ```powershell
 wsl --set-default-version 2
 ```
 
-## Version check
+## Version Check
 
-Run `wsl --version` in powershell or command prompt to ensure WSL2 is enabled. The WSL version number should be 2.4.4.0 or higher.
+Run `wsl --version` in PowerShell or command prompt to ensure WSL2 is enabled. The WSL version number should be 2.4.4.0 or higher.
 
 ```powershell
 PS C:\Users\Kaelem> wsl --version
@@ -90,7 +88,7 @@ DXCore version: 10.0.26100.1-240331-1435.ge-release
 Windows version: 10.0.19044.5131
 ```
 
-# Distro installation
+# Distro Installation
 
 **Ensure WSL is enabled and you have WSL 2.4.4 or newer. See the [version check](#version-check) instructions.**
 
@@ -103,7 +101,7 @@ Windows version: 10.0.19044.5131
 
 3. From the start menu you can launch the distribution from a new 'Containerlab' shortcut which has been added. 
 
-    or in powershell/cmd you can execute:
+    or in PowerShell/cmd you can execute:
 
     ```powershell
     wsl -d Containerlab
@@ -133,7 +131,7 @@ Windows version: 10.0.19044.5131
 
     - From the profile in Windows Terminal (recommended).
     - From the shortcut in the start menu.
-    - Executing `wsl -d Containerlab` in powershell or command prompt.
+    - Executing `wsl -d Containerlab` in PowerShell or command prompt.
 
 > [!NOTE]
 > Opening WSL via the shortcut or `wsl -d Containerlab` will not
@@ -145,7 +143,7 @@ Windows version: 10.0.19044.5131
 > [!IMPORTANT]
 > This feature is only supported on Windows 11.
 
-You can run [vrnetlab (VM-based)](https://github.com/hellt/vrnetlab) nodes ontop of WSL2 and use them in containerlab. Containerlab WSL is already configured so that nested virtualisation is enabled on the distro side.
+You can run [vrnetlab (VM-based)](https://github.com/hellt/vrnetlab) nodes on top of WSL2 and use them in containerlab. Containerlab WSL is already configured so that nested virtualization is enabled on the distro side.
 
 To use vrnetlab nodes on Containerlab WSL you must <u>ensure that nested virtualization is enabled globally in WSL</u>. 
 
@@ -155,7 +153,7 @@ To use vrnetlab nodes on Containerlab WSL you must <u>ensure that nested virtual
 
 See the [containerlab user manual](https://containerlab.dev/manual/vrnetlab/) for more information about vrnetlab.
 
-# Performance tuning
+# Performance Tuning
 
 WSL2 runs as a VM. By default allocated resources are:
 
@@ -167,7 +165,7 @@ WSL2 runs as a VM. By default allocated resources are:
 
 Despite the fairly generous resource allocation by default. WSL2 will not use 100% of the assigned resources.
 
-# Docker desktop
+# Docker Desktop
 
 If you have Docker desktop installed. You **must** ensure the integration with the Containerlab WSL distro is disabled, otherwise Containerlab will not work inside Containerlab WSL.
 
@@ -212,7 +210,7 @@ Clone the repository and build using the build script (you may have to `chmod +x
 
 This will place `clab.wsl` in `C:\temp`. Doubleclick to install the distribution.
 
-## Manual steps
+## Manual Steps
 
 1. From inside a WSL distro Build the container:
 
@@ -245,7 +243,7 @@ wsl --install --from-file clab.wsl
 
 # Uninstallation
 
-Uninstall Containerlab WSL using the following command in powershell/command prompt:
+Uninstall Containerlab WSL using the following command in PowerShell/command prompt:
 
 ```powershell
 wsl --unregister Containerlab
@@ -257,7 +255,7 @@ Ensure uninstallation by checking installed distros:
 wsl -l -v
 ```
 
-# Reference material
+# Reference Material
 
-https://learn.microsoft.com/en-us/windows/wsl/use-custom-distro#export-the-tar-from-a-container
-https://learn.microsoft.com/en-us/windows/wsl/build-custom-distro
+* https://learn.microsoft.com/en-us/windows/wsl/use-custom-distro#export-the-tar-from-a-container
+* https://learn.microsoft.com/en-us/windows/wsl/build-custom-distro
