@@ -259,5 +259,5 @@ wsl -l -v
 
 # Reference material
 
-https://learn.microsoft.com/en-us/windows/wsl/use-custom-distro#export-the-tar-from-a-container
-https://learn.microsoft.com/en-us/windows/wsl/build-custom-distro
+* https://learn.microsoft.com/en-us/windows/wsl/use-custom-distro#export-the-tar-from-a-container
+* https://learn.microsoft.com/en-us/windows/wsl/build-custom-distro
