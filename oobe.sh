@@ -203,10 +203,37 @@ Select zsh configuration: "
         esac
     done
 
-    import_ssh_keys
+    # Prompt for Proxy configuration
+    read -p "Are you behind a proxy that you want to configure now? (y/N) " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        echo -e "\033[34m\nPlease provide your HTTP_PROXY URL (e.g. http://proxy.example.com:8080):\033[0m"
+        read -r HTTP_PROXY
+        echo -e "\033[34m\nPlease provide your HTTPS_PROXY URL (often the same as HTTP_PROXY):\033[0m"
+        read -r HTTPS_PROXY
+        echo -e "\033[34m\nPlease provide your NO_PROXY list (default: localhost,127.0.0.1,::1):\033[0m"
+        read -r NO_PROXY
+        [ -z "$NO_PROXY" ] && NO_PROXY="localhost,127.0.0.1,::1"
 
+        # Write user inputs to /etc/proxy.conf
+        echo -e "\033[34m\nWriting proxy configuration to /etc/proxy.conf...\033[0m"
+        echo "HTTP_PROXY=$HTTP_PROXY" | sudo tee /etc/proxy.conf > /dev/null
+        echo "HTTPS_PROXY=$HTTPS_PROXY" | sudo tee -a /etc/proxy.conf > /dev/null
+        echo "NO_PROXY=$NO_PROXY" | sudo tee -a /etc/proxy.conf > /dev/null
+
+        echo -e "\033[34m\nConfiguring system-wide proxy using proxyman...\033[0m"
+        sudo proxyman set
+        echo -e "\033[32mProxy has been set. You can run 'sudo proxyman unset' to remove it.\033[0m"
+        echo -e "\033[33mTo apply proxy to this shell session right now, run:\033[0m"
+        echo -e "eval \"\$(sudo proxyman export)\""
+    else
+        echo -e "\033[34m\nSkipping proxy configuration.\033[0m"
+    fi
+
+    import_ssh_keys
     exit 0
 fi
+
 
 # This part will (should) never be reached since clab user exists,
 # but keeping it as a fallback
