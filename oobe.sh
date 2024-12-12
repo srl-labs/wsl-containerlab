@@ -222,7 +222,7 @@ Select zsh configuration: "
         echo "NO_PROXY=$NO_PROXY" | sudo tee -a /etc/proxy.conf > /dev/null
 
         echo -e "\033[34m\nConfiguring system-wide proxy using proxyman...\033[0m"
-        sudo proxyman set
+        SUDO_USER=clab SUDO_UID=1000 SUDO_GID=1000 proxyman set
         echo -e "\033[32mProxy has been set. You can run 'sudo proxyman unset' to remove it.\033[0m"
         echo -e "\033[33mTo apply proxy to this shell session right now, run:\033[0m"
         echo -e "eval \"\$(sudo proxyman export)\""
