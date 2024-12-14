@@ -29,7 +29,7 @@ We recommend using Windows Terminal for the best experience:
 - If you have Docker Desktop installed. See [Docker Desktop](#docker-desktop).
 - Done! you can start labbing. (see [DevPod](#devpod) for a great way to lab).
 
->[!NOTE]
+> [!NOTE]
 > Default credentials are `clab:clab`
 
 # WSL Installation
@@ -50,7 +50,7 @@ Restart your PC, and WSL2 should be installed.
 
 ### Windows 10
 
->[!TIP]
+> [!TIP]
 > Newer versions of Windows 10 allow usage of `wsl --install`, just like with Windows 11.
 
 **Instructions are from ['Manual installation steps for older versions of WSL'.](https://learn.microsoft.com/en-us/windows/wsl/install-manual)**
@@ -113,7 +113,8 @@ Windows version: 10.0.19044.5131
 
     This menu will give you options of `zsh`, `bash` (with a fancy two-line prompt) or `bash` with the default prompt.
 
-    You will also be presented with the choice to have the Fira Code [nerd font](https://www.nerdfonts.com/font-downloads) automatically installed on your system. **We recommend you install this font (especially if using `zsh` as your shell of choice)**.
+    You will also be presented with the choice to have the Fira Code [nerd font](https://www.nerdfonts.com/font-downloads) automatically installed on your system.
+    **We recommend you install this font (especially if using `zsh` as your shell of choice)**.
 
     Finally at the end SSH keys will be copied from your Windows host into Containerlab WSL to enable passwordless SSH. This is an integral step for [DevPod](#devpod) usage.
 
@@ -219,33 +220,33 @@ This will place `clab.wsl` in `C:\temp`. Doubleclick to install the distribution
 
 1. From inside a WSL distro Build the container:
 
-```bash
- docker build . --tag ghcr.io/kaelemc/clab-wsl-debian
-```
+    ```bash
+     docker build . --tag ghcr.io/kaelemc/clab-wsl-debian
+    ```
 
 2. Run it and export the filesystem to a `.wsl` file:
 
-```bash
-docker run -t --name wsl_export ghcr.io/kaelemc/clab-wsl-debian ls /
-docker export wsl_export > /mnt/c/temp/clab.wsl
-```
+    ```bash
+    docker run -t --name wsl_export ghcr.io/kaelemc/clab-wsl-debian ls /
+    docker export wsl_export > /mnt/c/temp/clab.wsl
+    ```
 
 > [!IMPORTANT]
 > Create the 'temp' directory on your C: drive if it doesn't exist.
 
 3. Remove the container to ease rebuilding:
 
-```bash
-docker rm wsl_export
-```
+    ```bash
+    docker rm wsl_export
+    ```
 
 4. Use it
   
-In your windows filesystem at `C:\temp` should be a file `clab.wsl`, double click to install. or use:
-
-```powershell
-wsl --install --from-file clab.wsl
-```
+    In your windows filesystem at `C:\temp` should be a file `clab.wsl`, double click to install. or use:
+    
+    ```powershell
+    wsl --install --from-file clab.wsl
+    ```
 
 # Uninstallation
 
