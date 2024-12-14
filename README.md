@@ -221,7 +221,7 @@ This will place `clab.wsl` in `C:\temp`. Doubleclick to install the distribution
  docker build . --tag ghcr.io/kaelemc/clab-wsl-debian
 ```
 
-2. Run it and export the filesystem to a `.wsl.` file:
+2. Run it and export the filesystem to a `.wsl` file:
 
 ```bash
 docker run -t --name wsl_export ghcr.io/kaelemc/clab-wsl-debian ls /
