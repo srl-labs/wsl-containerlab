@@ -98,7 +98,7 @@ Windows version: 10.0.19044.5131
 2. Double click the `.wsl` file to install the distribution.
 
 > [!NOTE]
-> You may see an error that nested virtualization is not supported. See the
+> If you see an error that nested virtualization is not supported, see the
 > [vrnetlab](#vrnetlab-nested-virtualization) section below.
 
 3. From the start menu you can launch the distribution from a new 'Containerlab' shortcut which has been added. 
