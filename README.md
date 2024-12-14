@@ -149,7 +149,10 @@ To use vrnetlab nodes on Containerlab WSL you must <u>ensure that nested virtual
 
 - You can do this by opening the *'WSL Settings'* app, going to the *'Optional features'* tab and ensuring *'Enable nested virtualization'* is enabled.
   
-  If you don't get any errors during installation or distro bootup saying that 'Nested virtualization is not supported on this machine.' You should be good to go.
+> [!NOTE]
+> You should be good to go if you don't get any errors during installation or
+> distro bootup saying that *'Nested virtualization is not supported on this
+> machine.'*
 
 See the [containerlab user manual](https://containerlab.dev/manual/vrnetlab/) for more information about vrnetlab.
 
