@@ -228,6 +228,7 @@ docker run -t --name wsl_export ghcr.io/kaelemc/clab-wsl-debian ls /
 docker export wsl_export > /mnt/c/temp/clab.wsl
 ```
 
+> [!IMPORTANT]
 > Create the 'temp' directory on your C: drive if it doesn't exist.
 
 3. Remove the container to ease rebuilding:
