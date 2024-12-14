@@ -230,13 +230,13 @@ docker export wsl_export > /mnt/c/temp/clab.wsl
 
 > Create the 'temp' directory on your C: drive if it doesn't exist.
 
-Remove the container to ease rebuilding:
+3. Remove the container to ease rebuilding:
 
 ```bash
 docker rm wsl_export
 ```
 
-3. Use it
+4. Use it
   
 In your windows filesystem at `C:\temp` should be a file `clab.wsl`, double click to install. or use:
 
