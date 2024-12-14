@@ -175,8 +175,8 @@ Despite the fairly generous resource allocation by default. WSL2 will not use 10
 If you have Docker desktop installed. You **must** ensure the integration with the Containerlab WSL distro is disabled, otherwise Containerlab will not work inside Containerlab WSL.
 
 1. Open Docker Desktop window and go to settings (gear icon on the title bar)
-2. Under the 'Resources tab, enter the 'WSL integration' page
-3. Ensure 'Containerlab' has integration disabled
+1. Under the 'Resources tab, enter the 'WSL integration' page
+1. Ensure 'Containerlab' has integration disabled
 
 ![](./images/docker_desktop_integration.png)
 
