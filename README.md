@@ -178,7 +178,7 @@ If you have Docker desktop installed. You **must** ensure the integration with t
 1. Under the 'Resources tab, enter the 'WSL integration' page
 1. Ensure 'Containerlab' has integration disabled
 
-![](./images/docker_desktop_integration.png)
+![Docker Desktop integration screenshot](./images/docker_desktop_integration.png)
 
 # DevPod
 
@@ -201,7 +201,7 @@ You can leave the other settings as the default values. See the screenshot below
 
 After configuring the provider, you are done! You can now use one-click labs you see with the DevPod button, or configure the lab workspaces yourself.
 
-![](./images/devpod_settings.png)
+![DevPod settings screenshot](./images/devpod_settings.png)
 
 # Developers
 
