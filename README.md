@@ -9,10 +9,10 @@ A WSL distribution designed for easy 'plug and play' usage with [Containerlab](h
 > [Download](https://github.com/microsoft/WSL/releases/tag/2.4.4)
 
 
-|   **OS**   | **Supported** | **VM-based NOSes** |
-|:----------:|---------------|--------------------|
-| Windows 10 |      Yes      |         No         |
-| Windows 11 |      Yes      |         Yes        |
+|   OS       | Supported   | VM-based NOSes |
+| :--------: | :---------: | :------------: |
+| Windows 10 | Yes         | No             |
+| Windows 11 | Yes         | Yes            |
 
 We recommend using Windows Terminal for the best experience:
 - Windows 11 users: Windows Terminal is installed by default.
@@ -182,11 +182,11 @@ for more information about vrnetlab.
 
 WSL2 runs as a VM. By default allocated resources are:
 
-| **Resource** | **Default value**    | **Description**                                                                                                     |
-|:------------:|----------------------|---------------------------------------------------------------------------------------------------------------------|
-| vCPU         | Logical thread count |               If your processor has 8 cores and 16 threads, WSL2 will assign 16 threads to the WSL VM               |
-| RAM          | 50% of system memory |                    If you have 32Gb of RAM on your system, WSL will allocate 16Gb to the WSL VM.                    |
-| Disk         | 1Tb                  | Regardless of disk size, the WSL VM will have a VHD with a maximum size of 1Tb. The disk is thin/sparse provisioned. |
+| Resource | Default value        | Description |
+| :------: | -------------------- | :---------- |
+| vCPU     | Logical thread count | If your processor has 8 cores and 16 threads, WSL2 will assign 16 threads to the WSL VM. |
+| RAM      | 50% of system memory | If you have 32Gb of RAM on your system, WSL will allocate 16Gb to the WSL VM. |
+| Disk     | 1Tb                  | Regardless of disk size, the WSL VM will have a VHD with a maximum size of 1Tb. The disk is thin/sparse provisioned. |
 
 Despite the fairly generous resource allocation by default. WSL2 will not use
 100% of the assigned resources.
