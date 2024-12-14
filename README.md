@@ -95,7 +95,7 @@ Windows version: 10.0.19044.5131
 
 1. Download the `.wsl` file from the [latest release](https://github.com/kaelemc/wsl-clab/releases/latest).
 
-2. Double click the `.wsl` file. This will install the distribution.
+2. Double click the `.wsl` file to install the distribution.
 
     > You may see an error that nested virtualization is not supported. See [vrnetlab](#vrnetlab-nested-virtualization).
 
