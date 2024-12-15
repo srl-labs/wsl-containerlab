@@ -1,8 +1,33 @@
 #!/bin/bash
 
-set -ue
-
 DEFAULT_UID='1000'
+
+function prompt_proxy {
+    read -p "Are you behind a proxy that you want to configure now? (y/N) " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        echo -e "\nPlease provide your HTTP_PROXY URL (e.g. http://proxy.example.com:8080):"
+        read -r HTTP_PROXY
+        echo -e "\nPlease provide your HTTPS_PROXY URL (often the same as HTTP_PROXY):"
+        read -r HTTPS_PROXY
+        echo -e "\nPlease provide your NO_PROXY list (default: localhost,127.0.0.1,::1):"
+        read -r NO_PROXY
+        [ -z "$NO_PROXY" ] && NO_PROXY="localhost,127.0.0.1,::1"
+
+        echo -e "\nWriting proxy configuration to /etc/proxy.conf..."
+        echo "HTTP_PROXY=$HTTP_PROXY" | sudo tee /etc/proxy.conf > /dev/null
+        echo "HTTPS_PROXY=$HTTPS_PROXY" | sudo tee -a /etc/proxy.conf > /dev/null
+        echo "NO_PROXY=$NO_PROXY" | sudo tee -a /etc/proxy.conf > /dev/null
+
+        echo -e "\nConfiguring system-wide proxy using proxyman..."
+        SUDO_USER=clab SUDO_UID=1000 SUDO_GID=1000 sudo proxyman set > /dev/null 2>&1
+        echo -e "\nProxy has been set. You can run 'sudo proxyman unset' to remove it."
+        eval "$(sudo /usr/local/bin/proxyman export)"
+        echo -e "\n\033[32mWelcome to Containerlab's WSL distribution\033[0m"
+    else
+        echo -e "\nSkipping proxy configuration.\n"
+    fi
+}
 
 function setup-bash-prompt {
     # Check if the prompt is already set up
@@ -62,7 +87,7 @@ function install_fonts {
         # Convert the path to Windows format
         FONTS_PATH=$(wslpath -w "$TMP_DIR/FiraCodeNF")
 
-        # Install fonts using PowerShell directly with ExecutionPolicy set to Bypass
+        # Install fonts using PowerShell
         powershell.exe -NoProfile -ExecutionPolicy Bypass -Command '
             $fontFiles = Get-ChildItem -Path "'"$FONTS_PATH"'" -Filter "*.ttf"
             foreach ($fontFile in $fontFiles) {
@@ -98,7 +123,6 @@ function import_ssh_keys {
     mkdir -p /home/clab/.ssh
     
     case $KEY_CHECK in 
-
         rsa*)
             KEY=$(powershell.exe -NoProfile -Command 'Get-Content $env:userprofile\.ssh\id_rsa.pub')
             echo $KEY | sudo tee -a /home/clab/.ssh/authorized_keys > /dev/null
@@ -112,130 +136,97 @@ function import_ssh_keys {
             echo $KEY | sudo tee -a /home/clab/.ssh/authorized_keys > /dev/null
             ;;
         False*)
-            powershell.exe -NoProfile -Command "ssh-keygen -t rsa -b 4096 -f \$env:userprofile\.ssh\id_rsa -N '\"\"'" > /dev/null 2>&1
+            powershell.exe -NoProfile -Command "ssh-keygen -t rsa -b 4096 -f \$env:userprofile\.ssh\id_rsa -N ''" > /dev/null 2>&1
             KEY=$(powershell.exe -NoProfile -Command 'Get-Content $env:userprofile\.ssh\id_rsa.pub')
             echo $KEY | sudo tee -a /home/clab/.ssh/authorized_keys > /dev/null
             ;;
         *)
-            echo "\033[34m\nSSH: Couldn't match key type, invoking Powershell may have failed. Create an issue at https://github.com/srl-labs/wsl-containerlab\033[0m"
+            echo "\033[34m\nSSH: Couldn't detect key type, please create a key manually or check PowerShell invocation.\033[0m"
     esac
 
-     echo -e "\033[32mSSH keys successfully copied. You can SSH into Container WSL passwordless with: 'ssh clab@localhost -p 2222'. (Ensure Containerlab WSL is open)\033[0m"
+     echo -e "\033[32mSSH keys successfully copied. You can SSH into Container WSL passwordless with: 'ssh clab@localhost -p 2222' (Ensure Containerlab WSL is open)\033[0m"
 }
 
-# We know the user clab exists from Dockerfile with UID 1000
-if getent passwd "$DEFAULT_UID" > /dev/null ; then
+# Start OOBE logic
+echo -e "\033[32mWelcome to Containerlab's WSL distribution\033[0m"
+echo "cd ~" >> /home/clab/.bashrc
+echo "echo clab | sudo -S mkdir -p /run/docker/netns" >> /home/clab/.bashrc
 
-    echo -e "\033[32mWelcome to Containerlab's WSL distribution\033[0m"
-
-    echo "cd ~" >> /home/clab/.bashrc
-    
-    echo "echo clab | sudo -S mkdir -p /run/docker/netns" >> /home/clab/.bashrc
-
-    PS3="
-Please select which shell you'd like to use: "
-
-    shell_opts=("zsh" "bash with two-line prompt" "bash (default WSL prompt)")
-    select shell in "${shell_opts[@]}"
-    do
-        case $shell in
-            "zsh")
-                echo -e "\033[34m\nzsh selected\033[0m"
-                echo -e "\033[33mNote: zsh with custom theme requires Nerd Font for proper symbol display\033[0m"
-                
-                PS3="
-Select zsh configuration: "
-                zsh_opts=("Full featured (many plugins)" "Lean version (minimal plugins)")
-                select zsh_config in "${zsh_opts[@]}"
-                do
-                    case $zsh_config in
-                        "Full featured (many plugins)")
-                            echo -e "\033[34m\nConfiguring full featured zsh\033[0m"
-                            read -p "Would you like to install FiraCode Nerd Font? (y/N) " -n 1 -r
-                            echo
-                            if [[ $REPLY =~ ^[Yy]$ ]]; then
-                                install_fonts
-                            fi
-                            # Use default .zshrc and .p10k.zsh
-                            sudo -u clab cp /home/clab/.zshrc{,.bak}
-                            sudo -u clab cp /home/clab/.p10k.zsh{,.bak}
-                            break 2
-                            ;;
-                        "Lean version (minimal plugins)")
-                            echo -e "\033[34m\nConfiguring lean zsh\033[0m"
-                            read -p "Would you like to install FiraCode Nerd Font? (y/N) " -n 1 -r
-                            echo
-                            if [[ $REPLY =~ ^[Yy]$ ]]; then
-                                install_fonts
-                            fi
-                            # Use lean versions
-                            sudo -u clab cp /home/clab/.zshrc{,.bak}
-                            sudo -u clab cp /home/clab/.p10k.zsh{,.bak}
-                            sudo -u clab cp /home/clab/.zshrc-lean /home/clab/.zshrc
-                            sudo -u clab cp /home/clab/.p10k-lean.zsh /home/clab/.p10k.zsh
-                            break 2
-                            ;;
-                        *) echo -e "\033[31m\n'$REPLY' is not a valid choice\033[0m";;
-                    esac
-                done
-                sudo chsh -s "$(which zsh)" clab
-                break
-                ;;
-            "bash with two-line prompt")
-                echo -e "\033[34m\nbash with two-line prompt selected. Configuring two-line prompt\033[0m"
-                read -p "Would you like to install FiraCode Nerd Font? (y/N) " -n 1 -r
-                echo
-                if [[ $REPLY =~ ^[Yy]$ ]]; then
-                    install_fonts
-                fi
-                # Backup .bashrc
-                sudo -u clab cp /home/clab/.bashrc /home/clab/.bashrc.bak
-                sudo chsh -s "$(which bash)" clab
-                setup-bash-prompt
-                break
-                ;;
-            "bash (default WSL prompt)")
-                echo -e "\033[34m\nbash selected\033[0m"
-                sudo chsh -s "$(which bash)" clab
-                break
-                ;;
-            *) echo -e "\033[31m\n'$REPLY' is not a valid choice\033[0m";;
-        esac
-    done
-
-    # Prompt for Proxy configuration
-    read -p "Are you behind a proxy that you want to configure now? (y/N) " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        echo -e "\033[34m\nPlease provide your HTTP_PROXY URL (e.g. http://proxy.example.com:8080):\033[0m"
-        read -r HTTP_PROXY
-        echo -e "\033[34m\nPlease provide your HTTPS_PROXY URL (often the same as HTTP_PROXY):\033[0m"
-        read -r HTTPS_PROXY
-        echo -e "\033[34m\nPlease provide your NO_PROXY list (default: localhost,127.0.0.1,::1):\033[0m"
-        read -r NO_PROXY
-        [ -z "$NO_PROXY" ] && NO_PROXY="localhost,127.0.0.1,::1"
-
-        # Write user inputs to /etc/proxy.conf
-        echo -e "\033[34m\nWriting proxy configuration to /etc/proxy.conf...\033[0m"
-        echo "HTTP_PROXY=$HTTP_PROXY" | sudo tee /etc/proxy.conf > /dev/null
-        echo "HTTPS_PROXY=$HTTPS_PROXY" | sudo tee -a /etc/proxy.conf > /dev/null
-        echo "NO_PROXY=$NO_PROXY" | sudo tee -a /etc/proxy.conf > /dev/null
-
-        echo -e "\033[34m\nConfiguring system-wide proxy using proxyman...\033[0m"
-        SUDO_USER=clab SUDO_UID=1000 SUDO_GID=1000 proxyman set
-        echo -e "\033[32mProxy has been set. You can run 'sudo proxyman unset' to remove it.\033[0m"
-        echo -e "\033[33mTo apply proxy to this shell session right now, run:\033[0m"
-        echo -e "eval \"\$(sudo proxyman export)\""
-    else
-        echo -e "\033[34m\nSkipping proxy configuration.\033[0m"
-    fi
-
-    import_ssh_keys
-    exit 0
+# Check connectivity before anything else
+if ! curl -fsSL --connect-timeout 5 https://www.goo3546gle.com -o /dev/null; then
+    echo -e "\nIt seems we couldn't connect to the internet directly. You might be behind a proxy."
+    prompt_proxy
 fi
 
+PS3="
 
-# This part will (should) never be reached since clab user exists,
-# but keeping it as a fallback
-echo 'No user account detected, Something may be wrong with your installation. Create an issue at <githubIssueLink>'
-exit 1
+Please select which shell you'd like to use: "
+shell_opts=("zsh" "bash with two-line prompt" "bash (default WSL prompt)")
+select shell in "${shell_opts[@]}"
+do
+    case $shell in
+        "zsh")
+            echo -e "\033[34m\nzsh selected\033[0m"
+            echo -e "\033[33mNote: zsh with custom theme requires Nerd Font for proper symbol display.\033[0m"
+            
+            PS3="
+
+Select zsh configuration: "
+            zsh_opts=("Full featured (many plugins)" "Lean version (minimal plugins)")
+            select zsh_config in "${zsh_opts[@]}"
+            do
+                case $zsh_config in
+                    "Full featured (many plugins)")
+                        echo -e "\033[34m\nConfiguring full featured zsh\033[0m"
+                        read -p "Would you like to install FiraCode Nerd Font? (y/N) " -n 1 -r
+                        echo
+                        if [[ $REPLY =~ ^[Yy]$ ]]; then
+                            install_fonts
+                        fi
+                        sudo -u clab cp /home/clab/.zshrc{,.bak}
+                        sudo -u clab cp /home/clab/.p10k.zsh{,.bak}
+                        break 2
+                        ;;
+                    "Lean version (minimal plugins)")
+                        echo -e "\033[34m\nConfiguring lean zsh\033[0m"
+                        read -p "Would you like to install FiraCode Nerd Font? (y/N) " -n 1 -r
+                        echo
+                        if [[ $REPLY =~ ^[Yy]$ ]]; then
+                            install_fonts
+                        fi
+                        sudo -u clab cp /home/clab/.zshrc{,.bak}
+                        sudo -u clab cp /home/clab/.p10k.zsh{,.bak}
+                        sudo -u clab cp /home/clab/.zshrc-lean /home/clab/.zshrc
+                        sudo -u clab cp /home/clab/.p10k-lean.zsh /home/clab/.p10k.zsh
+                        break 2
+                        ;;
+                    *) echo -e "\033[31m\n'$REPLY' is not a valid choice\033[0m";;
+                esac
+            done
+            sudo chsh -s "$(which zsh)" clab
+            break
+            ;;
+        "bash with two-line prompt")
+            echo -e "\033[34m\nbash with two-line prompt selected.\033[0m"
+            read -p "Would you like to install FiraCode Nerd Font? (y/N) " -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                install_fonts
+            fi
+            # Backup .bashrc
+            sudo -u clab cp /home/clab/.bashrc /home/clab/.bashrc.bak
+            sudo chsh -s "$(which bash)" clab
+            setup-bash-prompt
+            break
+            ;;
+        "bash (default WSL prompt)")
+            echo -e "\033[34m\nbash selected\033[0m"
+            sudo chsh -s "$(which bash)" clab
+            break
+            ;;
+        *) echo -e "\033[31m\n'$REPLY' is not a valid choice\033[0m";;
+    esac
+done
+
+import_ssh_keys
+exit 0
