@@ -153,7 +153,7 @@ echo "cd ~" >> /home/clab/.bashrc
 echo "echo clab | sudo -S mkdir -p /run/docker/netns" >> /home/clab/.bashrc
 
 # Check connectivity before anything else
-if ! curl -fsSL --connect-timeout 5 https://www.goo3546gle.com -o /dev/null; then
+if ! curl -fsSL --connect-timeout 5 https://www.google.com -o /dev/null; then
     echo -e "\nIt seems we couldn't connect to the internet directly. You might be behind a proxy."
     prompt_proxy
 fi
