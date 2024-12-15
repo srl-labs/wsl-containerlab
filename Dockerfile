@@ -23,6 +23,7 @@ RUN apt install -y  --no-install-recommends \
     openssh-server \
     zsh && rm -rf /var/lib/apt/lists/*
 
+# Copy WSL related config and scripts
 COPY --chmod=644 --chown=root:root ./wsl-distribution.conf /etc/wsl-distribution.conf
 COPY --chmod=644 --chown=root:root ./wsl.conf /etc/wsl.conf
 COPY --chmod=755 ./oobe.sh /etc/oobe.sh
@@ -30,6 +31,9 @@ COPY ./clab_icon.ico /usr/lib/wsl/clab_icon.ico
 COPY ./terminal-profile.json /usr/lib/wsl/terminal-profile.json
 
 COPY ./profile /etc/profile
+
+# Add proxyman tool
+COPY --chmod=755 ./proxyman.sh /usr/local/bin/proxyman
 
 RUN bash -c "echo 'port 2222' >> /etc/ssh/sshd_config"
 

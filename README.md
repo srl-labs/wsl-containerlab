@@ -26,6 +26,7 @@ We recommend using Windows Terminal for the best experience:
 - Double click the `.wsl` file to install.
 - Open 'Containerlab' from the start menu, or execute `wsl -d Containerlab`
 - Complete the interactive shell selection.
+- If you are behind a proxy, the OOBE script will let you configure it using [proxyman](https://github.com/FloSch62/proxyman).
 - If you have Docker Desktop installed. See [Docker Desktop](#docker-desktop).
 - Done! you can start labbing. (see [DevPod](#devpod) for a great way to lab).
 
