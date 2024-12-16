@@ -34,6 +34,8 @@ COPY ./profile /etc/profile
 
 # Add proxyman tool
 COPY --chmod=755 ./proxyman.sh /usr/local/bin/proxyman
+# Make eda ready
+COPY --chmod=755 ./make-eda-ready.sh /usr/local/bin/make-eda-ready
 
 RUN bash -c "echo 'port 2222' >> /etc/ssh/sshd_config"
 
