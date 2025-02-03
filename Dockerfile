@@ -8,7 +8,8 @@ RUN apt install -y \
     wget \
     nano \
     vim \
-    jq
+    jq \
+    bash-completion
 
 RUN apt install -y  --no-install-recommends \
     direnv \
