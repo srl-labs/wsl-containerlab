@@ -41,12 +41,12 @@ function setup-bash-prompt {
 # Custom Bash Prompt Configuration
 WHITE='\[\033[1;37m\]'; LIGHTRED='\[\033[1;31m\]'; LIGHTGREEN='\[\033[1;32m\]'; LIGHTBLUE='\[\033[1;34m\]'; DEFAULT='\[\033[0m\]'
 cLINES=$WHITE; cBRACKETS=$WHITE; cERROR=$LIGHTRED; cSUCCESS=$LIGHTGREEN; cHST=$LIGHTGREEN; cPWD=$LIGHTBLUE; cCMD=$DEFAULT
-promptcmd() { 
+promptcmd() {
     PREVRET=$?
     PS1="\n"
-    if [ $PREVRET -ne 0 ]; then 
+    if [ $PREVRET -ne 0 ]; then
         PS1="${PS1}${cBRACKETS}[${cERROR}x${cBRACKETS}]${cLINES}\342\224\200"
-    else 
+    else
         PS1="${PS1}${cBRACKETS}[${cSUCCESS}*${cBRACKETS}]${cLINES}\342\224\200"
     fi
     PS1="${PS1}${cBRACKETS}[${cHST}\h${cBRACKETS}]${cLINES}\342\224\200"
@@ -102,7 +102,7 @@ function install_fonts {
         rm -rf "$TMP_DIR"
 
         echo -e "\033[32mFiraCode Nerd Font installed successfully.\033[0m"
-        echo -e "\033[33mNote: You may need to restart Windows Terminal to see the new fonts in the font selection.\033[0m"
+        echo -e "\033[33mNote: You may need to restart Windows Terminal to see the new fonts.\033[0m"
     fi
 }
 
@@ -121,8 +121,8 @@ function import_ssh_keys {
     ')
 
     mkdir -p /home/clab/.ssh
-    
-    case $KEY_CHECK in 
+
+    case $KEY_CHECK in
         rsa*)
             KEY=$(powershell.exe -NoProfile -Command 'Get-Content $env:userprofile\.ssh\id_rsa.pub')
             echo $KEY | sudo tee -a /home/clab/.ssh/authorized_keys > /dev/null
@@ -141,10 +141,43 @@ function import_ssh_keys {
             echo $KEY | sudo tee -a /home/clab/.ssh/authorized_keys > /dev/null
             ;;
         *)
-            echo "\033[34m\nSSH: Couldn't detect key type, please create a key manually or check PowerShell invocation.\033[0m"
+            echo -e "\033[34m\nSSH: Could not detect key type. Please check or create a key.\033[0m"
     esac
 
-     echo -e "\033[32mSSH keys successfully copied. You can SSH into Container WSL passwordless with: 'ssh clab@localhost -p 2222' (Ensure Containerlab WSL is open)\033[0m"
+    echo -e "\033[32mSSH keys successfully copied. You can SSH into Containerlab WSL passwordless with: 'ssh clab@localhost -p 2222' (Ensure Containerlab WSL is open)\033[0m"
+}
+
+### CONTAINERLAB COMPLETIONS ###
+function install_clab_completions_bash {
+    echo "Installing Containerlab completions for BASH..."
+
+    mkdir -p /etc/bash_completion.d
+    containerlab completion bash > /etc/bash_completion.d/containerlab
+
+    # Also enable completions for the 'clab' alias
+    {
+        echo ""
+        echo "# Also autocomplete for 'clab' alias"
+        echo "complete -o default -F __start_containerlab clab"
+    } >> /etc/bash_completion.d/containerlab
+}
+
+function install_clab_completions_zsh {
+    echo "Installing Containerlab completions for ZSH..."
+
+    # oh-my-zsh custom completions directory
+    local ZSH_COMPLETIONS_DIR="/home/clab/.oh-my-zsh/custom/plugins/zsh-autocomplete/Completions"
+
+    # Make sure directory exists
+    mkdir -p "$ZSH_COMPLETIONS_DIR"
+
+    containerlab completion zsh > "${ZSH_COMPLETIONS_DIR}/_containerlab"
+
+    # Include 'clab' alias in the compdef
+    sed -i 's/compdef _containerlab containerlab/compdef _containerlab containerlab clab/g' \
+        "${ZSH_COMPLETIONS_DIR}/_containerlab"
+
+    chown clab:clab "${ZSH_COMPLETIONS_DIR}/_containerlab"
 }
 
 # Start OOBE logic
@@ -168,7 +201,7 @@ do
         "zsh")
             echo -e "\033[34m\nzsh selected\033[0m"
             echo -e "\033[33mNote: zsh with custom theme requires Nerd Font for proper symbol display.\033[0m"
-            
+
             PS3="
 
 Select zsh configuration: "
@@ -200,12 +233,19 @@ Select zsh configuration: "
                         sudo -u clab cp /home/clab/.p10k-lean.zsh /home/clab/.p10k.zsh
                         break 2
                         ;;
-                    *) echo -e "\033[31m\n'$REPLY' is not a valid choice\033[0m";;
+                    *)
+                        echo -e "\033[31m\n'$REPLY' is not a valid choice\033[0m"
+                        ;;
                 esac
             done
+
             sudo chsh -s "$(which zsh)" clab
+
+            # Install Containerlab completions for zsh
+            install_clab_completions_zsh
             break
             ;;
+
         "bash with two-line prompt")
             echo -e "\033[34m\nbash with two-line prompt selected.\033[0m"
             read -p "Would you like to install FiraCode Nerd Font? (y/N) " -n 1 -r
@@ -217,14 +257,24 @@ Select zsh configuration: "
             sudo -u clab cp /home/clab/.bashrc /home/clab/.bashrc.bak
             sudo chsh -s "$(which bash)" clab
             setup-bash-prompt
+
+            # Install Containerlab completions for bash
+            install_clab_completions_bash
             break
             ;;
+
         "bash (default WSL prompt)")
             echo -e "\033[34m\nbash selected\033[0m"
             sudo chsh -s "$(which bash)" clab
+
+            # Install Containerlab completions for bash
+            install_clab_completions_bash
             break
             ;;
-        *) echo -e "\033[31m\n'$REPLY' is not a valid choice\033[0m";;
+
+        *)
+            echo -e "\033[31m\n'$REPLY' is not a valid choice\033[0m"
+            ;;
     esac
 done
 

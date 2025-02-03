@@ -55,6 +55,7 @@ WORKDIR /home/clab
 
 # Install Containerlab
 RUN curl -sL https://containerlab.dev/setup | sudo -E bash -s "all"
+RUN sudo usermod -aG clab_admins clab
 
 # Install gNMIc and gNOIc
 RUN bash -c "$(curl -sL https://get-gnmic.openconfig.net)" && \
