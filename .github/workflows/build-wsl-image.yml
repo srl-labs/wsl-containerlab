@@ -37,7 +37,7 @@ jobs:
           mv clab.tar clab.wsl
 
       - name: Upload WSL Image Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: clab-wsl2
           path: clab.wsl
