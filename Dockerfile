@@ -8,7 +8,8 @@ RUN apt install -y \
     wget \
     nano \
     vim \
-    jq
+    jq \
+    bash-completion
 
 RUN apt install -y  --no-install-recommends \
     direnv \
@@ -55,7 +56,6 @@ WORKDIR /home/clab
 
 # Install Containerlab
 RUN curl -sL https://containerlab.dev/setup | sudo -E bash -s "all"
-RUN sudo usermod -aG clab_admins clab
 
 # Install gNMIc and gNOIc
 RUN bash -c "$(curl -sL https://get-gnmic.openconfig.net)" && \
