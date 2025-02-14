@@ -2,13 +2,6 @@
 
 A WSL distribution designed for easy 'plug and play' usage with [Containerlab](https://containerlab.dev).
 
-> [!IMPORTANT]
-> WSL 2.4.4 is required to use this distribution. It is currently in 
-> pre-release, meaning you must manually install it.
->
-> [Download](https://github.com/microsoft/WSL/releases/tag/2.4.4)
-
-
 |   OS       | Supported   | VM-based NOSes |
 | :--------: | :---------: | :------------: |
 | Windows 10 | Yes         | No             |
@@ -20,7 +13,7 @@ We recommend using Windows Terminal for the best experience:
 
 # Quick Start
 
-**Ensure WSL2.4.4 or newer is installed.**
+**Ensure you are on the latest version of WSL (WSL2.4.4 or newer). Use `wsl --update`.**
 
 - Download the `.wsl` file from the [releases page](https://github.com/kaelemc/wsl-clab/releases/latest).
 - Double click the `.wsl` file to install.
@@ -235,6 +228,71 @@ After configuring the provider, you are done! You can now use one-click labs you
 see with the DevPod button, or configure the lab workspaces yourself.
 
 ![DevPod settings screenshot](./images/devpod_settings.png)
+
+> [!NOTE]
+> You may have to tick 'Use Builtin Ssh' for correct behaviour.
+
+# Accessing lab nodes
+
+You probably want to access your nodes from a terminal application your computer, such as SecureCRT, MobaXTerm, PuTTY etc.
+
+There are two ways you can achieve this:
+- On Windows, add a static route to the lab management network.
+- SSH Tunneling/Proxy (depends on terminal/console application support).
+
+## Adding a static route
+
+You can add a static route to Windows, where the destination subnet is your labs management subnet, and the next hop is the IP of Containerlab WSL.
+
+### Step 1 - Get the IP Address of Containerlab WSL
+
+In Containerlab WSL -- Execute and copy/note down the outputted IP address
+```bash
+ip addr show eth0 | grep -oP '(?<=inet\s)\d+(\.\d+){3}'
+```
+
+### Step 2 - Add the route
+
+By default the Containerlab management subnet is `172.20.20.0/24`. If you have used a custom management subnet in your toplogy, please adjust the below command accordingly.
+
+In Windows, open an elevated Command Prompt Window (Run as Administrator). Execute the following (replace `<Management Subnet>`, `<Management Mask>` and `<WSL IP Address>`)
+```cmd
+route add <Management Subnet> MASK <Management Mask> <WSL IP ADDRESS>
+```
+
+For example, if using the default management subnet of `172.20.20.0/24`, and the Containerlab WSL IP address was `172.28.121.79`; The command would be:
+```cmd
+route add 172.20.20.0 MASK 255.255.255.0 172.12.121.79
+```
+
+### Removing the route (Optional)
+
+If for some reason you need to remove the route, say the subnet or WSL IP address changed, you can execute the following in an elevated Command Prompt window:
+```cmd
+route delete <Management Subnet>
+```
+
+## Configuring SSH tunneling (SecureCRT)
+
+In SecureCRT you can configure SSH tunneling so you can access your lab nodes (running in WSL) without having to modify routes in Windows.
+
+### Step 1 - Configure an SSH session to WSL Containerlab
+
+In SecureCRT create and save an SSH session to WSL Containerlab. Session parameters are below:
+
+**Session Parameters**
+
+- Hostname: `wsl.localhost`
+- Port: `2222`
+- Username: `clab`
+
+Ensure you save the session.
+
+### Step 2 - Add sessions to your lab nodes
+
+The only remaining step is when adding lab nodes, ensure you go to the 'Firewall' settings -> 'Select Session' -> Select the saved session to WSL (default name: `wsl.localhost`).
+
+Now you should be able to 'natively' connect to your lab nodes from within Windows.
 
 # Developers
 
