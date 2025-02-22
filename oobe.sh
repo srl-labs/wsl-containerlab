@@ -136,7 +136,8 @@ function import_ssh_keys {
             echo $KEY | sudo tee -a /home/clab/.ssh/authorized_keys > /dev/null
             ;;
         False*)
-            powershell.exe -NoProfile -Command "ssh-keygen -t rsa -b 4096 -f \$env:userprofile\.ssh\id_rsa -N ''" > /dev/null 2>&1
+            SSH_CMD="ssh-keygen -t rsa -b 4096 -f \$env:USERPROFILE\.ssh\id_rsa -N '\"\"'"
+            powershell.exe -Command $SSH_CMD
             KEY=$(powershell.exe -NoProfile -Command 'Get-Content $env:userprofile\.ssh\id_rsa.pub')
             echo $KEY | sudo tee -a /home/clab/.ssh/authorized_keys > /dev/null
             ;;
