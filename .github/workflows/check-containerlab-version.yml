@@ -81,18 +81,10 @@ jobs:
 
       - name: Create GitHub Release
         if: steps.release.outputs.NEED_RELEASE == 'true'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # Create a new release using the GitHub API
-          curl -s -X POST \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/${{ github.repository }}/releases \
-            -d '{
-              "tag_name": "${{ steps.release.outputs.NEW_TAG }}",
-              "name": "Release ${{ steps.release.outputs.NEW_TAG }}",
-              "body": "WSL2 image for containerlab version ${{ steps.containerlab.outputs.CONTAINERLAB_VERSION }}\n\nThis release was automatically generated based on the latest containerlab release.",
-              "draft": false,
-              "prerelease": false
-            }'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.release.outputs.NEW_TAG }}
+          name: "Release ${{ steps.release.outputs.NEW_TAG }}"
+          body: "WSL2 image for containerlab version ${{ steps.containerlab.outputs.CONTAINERLAB_VERSION }}\n\nThis release was automatically generated based on the latest containerlab release."
+          draft: false
+          prerelease: false
