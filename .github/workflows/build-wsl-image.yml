@@ -2,7 +2,7 @@ name: Build and Publish WSL2 Image
 
 on:
   release:
-    types: [created]
+    types: [created, published, edited]
 
 permissions:
   contents: write
