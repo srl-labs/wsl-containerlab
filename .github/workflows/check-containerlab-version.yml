@@ -1,0 +1,98 @@
+name: Check for new containerlab version and release
+
+on:
+  schedule:
+    # Run daily at midnight UTC
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    # Allow manual triggering
+
+jobs:
+  check-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history to get tags
+
+      - name: Get latest containerlab version
+        id: containerlab
+        run: |
+          # Fetch the latest release information from containerlab repository
+          CONTAINERLAB_LATEST=$(curl -s https://api.github.com/repos/srl-labs/containerlab/releases/latest | jq -r .tag_name)
+          echo "CONTAINERLAB_VERSION=${CONTAINERLAB_LATEST#v}" >> $GITHUB_OUTPUT
+          echo "Latest containerlab version: ${CONTAINERLAB_LATEST#v}"
+
+      - name: Get latest WSL release version
+        id: current_release
+        run: |
+          # Get the latest release tag from this repository
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "none")
+          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_OUTPUT
+          
+          if [[ "$LATEST_TAG" == "none" ]]; then
+            echo "No releases found"
+            echo "CURRENT_CONTAINERLAB_VERSION=none" >> $GITHUB_OUTPUT
+            echo "CURRENT_WSL_VERSION=none" >> $GITHUB_OUTPUT
+          else
+            # Parse the version (format: 0.65.1-1.0)
+            CURRENT_CONTAINERLAB_VERSION=$(echo $LATEST_TAG | cut -d'-' -f1)
+            CURRENT_WSL_VERSION=$(echo $LATEST_TAG | cut -d'-' -f2)
+            echo "CURRENT_CONTAINERLAB_VERSION=$CURRENT_CONTAINERLAB_VERSION" >> $GITHUB_OUTPUT
+            echo "CURRENT_WSL_VERSION=$CURRENT_WSL_VERSION" >> $GITHUB_OUTPUT
+            echo "Current containerlab version: $CURRENT_CONTAINERLAB_VERSION"
+            echo "Current WSL version: $CURRENT_WSL_VERSION"
+          fi
+
+      - name: Determine if release is needed
+        id: release
+        run: |
+          NEED_RELEASE="false"
+          NEW_WSL_VERSION="1.0"
+          
+          # Check if containerlab version is different
+          if [[ "${{ steps.current_release.outputs.CURRENT_CONTAINERLAB_VERSION }}" != "${{ steps.containerlab.outputs.CONTAINERLAB_VERSION }}" ]]; then
+            NEED_RELEASE="true"
+          elif [[ "${{ steps.current_release.outputs.CURRENT_CONTAINERLAB_VERSION }}" == "none" ]]; then
+            # No previous releases
+            NEED_RELEASE="true"
+          fi
+          
+          # Set output variables
+          echo "NEED_RELEASE=$NEED_RELEASE" >> $GITHUB_OUTPUT
+          echo "NEW_TAG=${{ steps.containerlab.outputs.CONTAINERLAB_VERSION }}-$NEW_WSL_VERSION" >> $GITHUB_OUTPUT
+          
+          if [[ "$NEED_RELEASE" == "true" ]]; then
+            echo "Release needed: ${{ steps.containerlab.outputs.CONTAINERLAB_VERSION }}-$NEW_WSL_VERSION"
+          else
+            echo "No release needed. Latest containerlab version already supported."
+          fi
+
+      - name: Create Release Tag
+        if: steps.release.outputs.NEED_RELEASE == 'true'
+        run: |
+          git config --local user.email "github-actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git tag -a ${{ steps.release.outputs.NEW_TAG }} -m "Release ${{ steps.release.outputs.NEW_TAG }}"
+          git push origin ${{ steps.release.outputs.NEW_TAG }}
+
+      - name: Create GitHub Release
+        if: steps.release.outputs.NEED_RELEASE == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Create a new release using the GitHub API
+          curl -s -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/releases \
+            -d '{
+              "tag_name": "${{ steps.release.outputs.NEW_TAG }}",
+              "name": "Release ${{ steps.release.outputs.NEW_TAG }}",
+              "body": "WSL2 image for containerlab version ${{ steps.containerlab.outputs.CONTAINERLAB_VERSION }}\n\nThis release was automatically generated based on the latest containerlab release.",
+              "draft": false,
+              "prerelease": false
+            }'
