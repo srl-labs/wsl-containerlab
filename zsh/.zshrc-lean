@@ -26,6 +26,3 @@ source "$ZSH/oh-my-zsh.sh"
 
 # 6. Load Powerlevel10k configuration if available.
 [[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
-
-# 7. Change directory to home.
-cd ~

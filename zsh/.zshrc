@@ -136,6 +136,5 @@ eval "$(pyenv init -)"
 # go path
 export PATH=$PATH:/usr/local/go/bin:~/go/bin
 
-cd ~
 # create /run/docker/netns without password prompt
 echo clab | sudo -S mkdir -p /run/docker/netns

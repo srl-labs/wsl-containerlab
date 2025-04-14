@@ -184,7 +184,6 @@ function install_clab_completions_zsh {
 
 # --- Start OOBE logic ---
 echo -e "\033[32mWelcome to Containerlab's WSL distribution\033[0m"
-echo "cd ~" >> /home/clab/.bashrc
 echo "echo clab | sudo -S mkdir -p /run/docker/netns" >> /home/clab/.bashrc
 
 # Check connectivity before anything else
