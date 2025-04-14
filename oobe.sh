@@ -160,7 +160,7 @@ function install_clab_completions_bash {
         echo ""
         echo "# Also autocomplete for 'clab' alias"
         echo "complete -o default -F __start_containerlab clab"
-    } >> /etc/bash_completion.d/containerlab
+    } | sudo tee -a /etc/bash_completion.d/containerlab > /dev/null # Use sudo tee here
 }
 
 function install_clab_completions_zsh {
@@ -181,7 +181,8 @@ function install_clab_completions_zsh {
     chown clab:clab "${ZSH_COMPLETIONS_DIR}/_containerlab"
 }
 
-# Start OOBE logic
+
+# --- Start OOBE logic ---
 echo -e "\033[32mWelcome to Containerlab's WSL distribution\033[0m"
 echo "cd ~" >> /home/clab/.bashrc
 echo "echo clab | sudo -S mkdir -p /run/docker/netns" >> /home/clab/.bashrc
@@ -191,6 +192,19 @@ if ! curl -fsSL --connect-timeout 5 https://www.google.com -o /dev/null; then
     echo -e "\nIt seems we couldn't connect to the internet directly. You might be behind a proxy."
     prompt_proxy
 fi
+
+# --- Apply sysctl settings ---
+echo -e "\n\033[34mApplying system kernel settings for inotify...\033[0m"
+
+if sudo mkdir -p /etc/sysctl.d > /dev/null 2>&1 && \
+   echo -e "fs.inotify.max_user_watches=1048576\nfs.inotify.max_user_instances=512" | sudo tee /etc/sysctl.d/90-wsl-inotify.conf > /dev/null 2>&1 && \
+   sudo sysctl --system > /dev/null 2>&1 && \
+   sudo systemctl restart docker > /dev/null 2>&1; then
+    echo -e "\033[32mSystem kernel settings applied.\033[0m"
+else
+    echo -e "\033[31mWarning: Failed to apply all sysctl settings. Some features might be affected.\033[0m"
+fi
+# --- End sysctl settings ---
 
 PS3="
 
@@ -265,7 +279,7 @@ Select zsh configuration: "
             ;;
 
         "bash (default WSL prompt)")
-            echo -e "\033[34m\nbash selected\033[0m"
+            echo -e "\033[34m\nbash selected\030[0m" # Corrected escape sequence
             sudo chsh -s "$(which bash)" clab
 
             # Install Containerlab completions for bash
