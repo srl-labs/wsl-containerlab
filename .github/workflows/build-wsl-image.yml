@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     # Allow manual triggering
   release:
-    types: [created, published, edited]
+    types: [published]
 
 permissions:
   contents: write
