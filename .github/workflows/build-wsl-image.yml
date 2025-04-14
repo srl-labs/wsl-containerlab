@@ -60,8 +60,8 @@ jobs:
         run: |
           NEED_RELEASE="false"
           NEW_WSL_VERSION="1.0"
-          
-          # Always build when manually triggered
+
+          # Always build when manually triggered via workflow_dispatch
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             NEED_RELEASE="true"
             echo "Manual trigger detected - forcing release"
@@ -119,15 +119,10 @@ jobs:
           draft: false
           prerelease: false
 
-  build-and-publish:
+  # This job runs when triggered by a release event (manual release)
+  build-and-publish-from-release:
     runs-on: ubuntu-22.04
-    # Run this job if triggered by a release event or if the check-and-release job determined a release is needed
-    # The needs clause is conditional to avoid dependency on a job that might be skipped
-    needs: [check-and-release]
-    if: >
-      github.event_name == 'release' ||
-      (github.event_name != 'release' && needs.check-and-release.outputs.NEED_RELEASE == 'true')
-
+    if: github.event_name == 'release'
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -162,17 +157,62 @@ jobs:
       - name: Get release tag
         id: get_tag
         run: |
-          if [[ "${{ github.event_name }}" == "release" ]]; then
-            # For releases triggered by the release event
-            REF_NAME="${{ github.ref }}"
-            TAG="${REF_NAME#refs/tags/}"
-            echo "Using release tag: $TAG"
-            echo "TAG=$TAG" >> $GITHUB_OUTPUT
-          else
-            # For releases created by the check-and-release job
-            echo "Using new tag: ${{ needs.check-and-release.outputs.NEW_TAG }}"
-            echo "TAG=${{ needs.check-and-release.outputs.NEW_TAG }}" >> $GITHUB_OUTPUT
-          fi
+          # For releases triggered by the release event
+          REF_NAME="${{ github.ref }}"
+          TAG="${REF_NAME#refs/tags/}"
+          echo "Using release tag: $TAG"
+          echo "TAG=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Upload Release Asset
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: clab.wsl
+          asset_name: clab-${{ steps.get_tag.outputs.TAG }}.wsl
+          tag: ${{ steps.get_tag.outputs.TAG }}
+
+  # This job runs when triggered by a schedule or workflow_dispatch event and a release is needed
+  build-and-publish-from-check:
+    runs-on: ubuntu-22.04
+    needs: [check-and-release]
+    if: needs.check-and-release.outputs.NEED_RELEASE == 'true'
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker Image
+        run: |
+          docker build . --tag clab-wsl-debian
+
+      - name: Run Docker Container and Export Filesystem
+        run: |
+          # Run the Docker container
+          docker run -t --name wsl_export clab-wsl-debian ls /
+          # Export the container's filesystem to a tar file
+          docker export wsl_export -o clab.tar
+          # Remove the container to clean up
+          docker rm wsl_export
+
+      - name: Rename tar to .wsl file
+        run: |
+          # Rename the tar file to have a .wsl extension
+          mv clab.tar clab.wsl
+
+      - name: Upload WSL Image Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: clab-wsl2
+          path: clab.wsl
+
+      - name: Get release tag
+        id: get_tag
+        run: |
+          # For releases created by the check-and-release job
+          echo "Using new tag: ${{ needs.check-and-release.outputs.NEW_TAG }}"
+          echo "TAG=${{ needs.check-and-release.outputs.NEW_TAG }}" >> $GITHUB_OUTPUT
 
       - name: Upload Release Asset
         uses: svenstaro/upload-release-action@v2
