@@ -29,10 +29,17 @@ jobs:
       - name: Get latest containerlab version
         id: containerlab
         run: |
-          # Fetch the latest release information from containerlab repository
-          CONTAINERLAB_LATEST=$(curl -s https://api.github.com/repos/srl-labs/containerlab/releases/latest | jq -r .tag_name)
-          echo "CONTAINERLAB_VERSION=${CONTAINERLAB_LATEST#v}" >> $GITHUB_OUTPUT
-          echo "Latest containerlab version: ${CONTAINERLAB_LATEST#v}"
+          # Get latest version by following the redirect to the latest release
+          LATEST_URL=$(curl -sLI -o /dev/null -w '%{url_effective}' https://github.com/srl-labs/containerlab/releases/latest)
+          echo "Latest release URL: $LATEST_URL"
+          
+          # Extract version from URL
+          CONTAINERLAB_LATEST=$(echo $LATEST_URL | rev | cut -d'/' -f1 | rev)
+          
+          # Remove the 'v' prefix
+          CONTAINERLAB_VERSION=${CONTAINERLAB_LATEST#v}
+          echo "CONTAINERLAB_VERSION=$CONTAINERLAB_VERSION" >> $GITHUB_OUTPUT
+          echo "Latest containerlab version: $CONTAINERLAB_VERSION"
 
       - name: Get latest WSL release version
         id: current_release
