@@ -1,230 +1,168 @@
-name: Check, Release, Build and Publish WSL2 Image
+name: Check, Build & Publish WSL2 Image
 
 on:
+  # Nightly check at 00:00 UTC
   schedule:
-    # Run daily at midnight UTC
     - cron: '0 0 * * *'
+  # Manual “Run workflow” button
   workflow_dispatch:
-    # Allow manual triggering
+  # When you click “Publish release” in the UI
   release:
     types: [published]
 
 permissions:
-  contents: write
+  contents: write     # required for tag push & gh‑release
 
 jobs:
+# ------------------------------------------------------------
+# 1. Decide whether we need a new release tag
+#    (runs on schedule or workflow‑dispatch, never on release)
+# ------------------------------------------------------------
   check-and-release:
-    runs-on: ubuntu-latest
-    # Skip this job if triggered by a release event
     if: github.event_name != 'release'
+    runs-on: ubuntu-latest
     outputs:
-      NEED_RELEASE: ${{ steps.release.outputs.NEED_RELEASE }}
-      NEW_TAG: ${{ steps.release.outputs.NEW_TAG }}
+      NEED_RELEASE: ${{ steps.decide.outputs.NEED_RELEASE }}
+      NEW_TAG:      ${{ steps.decide.outputs.NEW_TAG }}
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository ⚡
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Fetch all history to get tags
+          fetch-depth: 0           # get full history
+          fetch-tags:  true        # still unreliable; we force‑fetch below
 
-      - name: Get latest containerlab version
-        id: containerlab
+      - name: Ensure ALL tags are present
+        run: git fetch --tags --prune --force
+
+      - name: Get latest Containerlab version
+        id: clab
+        shell: bash
         run: |
-          # Get latest version by following the redirect to the latest release
-          LATEST_URL=$(curl -sLI -o /dev/null -w '%{url_effective}' https://github.com/srl-labs/containerlab/releases/latest)
-          echo "Latest release URL: $LATEST_URL"
-          
-          # Extract version from URL
-          CONTAINERLAB_LATEST=$(echo $LATEST_URL | rev | cut -d'/' -f1 | rev)
-          
-          # Remove the 'v' prefix
-          CONTAINERLAB_VERSION=${CONTAINERLAB_LATEST#v}
-          echo "CONTAINERLAB_VERSION=$CONTAINERLAB_VERSION" >> $GITHUB_OUTPUT
-          echo "Latest containerlab version: $CONTAINERLAB_VERSION"
+          set -euo pipefail
+          latest_url=$(curl -sLI -o /dev/null -w '%{url_effective}' \
+                       https://github.com/srl-labs/containerlab/releases/latest)
+          ver=${latest_url##*/}
+          echo "CONTAINERLAB_VER=${ver#v}" >> "$GITHUB_OUTPUT"
+          echo "Found Containerlab ${ver#v}"
 
-      - name: Get latest WSL release version
-        id: current_release
+      - name: Get latest WSL image tag
+        id: current
+        shell: bash
         run: |
-          # Get the latest release tag from this repository
-          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "none")
-          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_OUTPUT
+          set -euo pipefail
+          tag=$(git tag --list --sort=-v:refname | head -n1 || true)
+          echo "LATEST_TAG=$tag" >> "$GITHUB_OUTPUT"
 
-          if [[ "$LATEST_TAG" == "none" ]]; then
-            echo "No releases found"
-            echo "CURRENT_CONTAINERLAB_VERSION=none" >> $GITHUB_OUTPUT
-            echo "CURRENT_WSL_VERSION=none" >> $GITHUB_OUTPUT
-          else
-            # Parse the version (format: 0.65.1-1.0)
-            CURRENT_CONTAINERLAB_VERSION=$(echo $LATEST_TAG | cut -d'-' -f1)
-            CURRENT_WSL_VERSION=$(echo $LATEST_TAG | cut -d'-' -f2)
-            echo "CURRENT_CONTAINERLAB_VERSION=$CURRENT_CONTAINERLAB_VERSION" >> $GITHUB_OUTPUT
-            echo "CURRENT_WSL_VERSION=$CURRENT_WSL_VERSION" >> $GITHUB_OUTPUT
-            echo "Current containerlab version: $CURRENT_CONTAINERLAB_VERSION"
-            echo "Current WSL version: $CURRENT_WSL_VERSION"
+          if [[ -z "$tag" ]]; then
+            echo "CONTAINERLAB_CUR=none"  >> "$GITHUB_OUTPUT"
+            echo "WSL_CUR=none"           >> "$GITHUB_OUTPUT"
+            exit 0
           fi
 
-      - name: Determine if release is needed
-        id: release
-        run: |
-          NEED_RELEASE="false"
-          NEW_WSL_VERSION="1.0"
+          echo "Latest tag is $tag"
 
-          # Always build when manually triggered via workflow_dispatch
+          echo "CONTAINERLAB_CUR=${tag%%-*}" >> "$GITHUB_OUTPUT"
+          echo "WSL_CUR=${tag#*-}"           >> "$GITHUB_OUTPUT"
+
+      - name: Decide whether to cut a new tag
+        id: decide
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          need_release="false"
+          new_clab="${{ steps.clab.outputs.CONTAINERLAB_VER }}"
+          cur_clab="${{ steps.current.outputs.CONTAINERLAB_CUR }}"
+          cur_wsl="${{ steps.current.outputs.WSL_CUR }}"
+          new_wsl="1.0"
+
+          bump_wsl () {
+            local major=${cur_wsl%%.*}
+            local minor=${cur_wsl#*.}
+            new_wsl="${major}.$((minor+1))"
+          }
+
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            NEED_RELEASE="true"
-            echo "Manual trigger detected - forcing release"
-          # Check if containerlab version is different
-          elif [[ "${{ steps.current_release.outputs.CURRENT_CONTAINERLAB_VERSION }}" != "${{ steps.containerlab.outputs.CONTAINERLAB_VERSION }}" ]]; then
-            NEED_RELEASE="true"
-          elif [[ "${{ steps.current_release.outputs.CURRENT_CONTAINERLAB_VERSION }}" == "none" ]]; then
-            # No previous releases
-            NEED_RELEASE="true"
+            need_release="true"
+            [[ "$cur_clab" == "$new_clab" && "$cur_wsl" != "none" ]] && bump_wsl
+          elif [[ "$cur_clab" == "none" ]]; then
+            need_release="true"
+          elif [[ "$cur_clab" != "$new_clab" ]]; then
+            need_release="true"
           fi
 
-          # For manual triggers with no version change, use current containerlab version with bumped WSL version
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ steps.current_release.outputs.CURRENT_CONTAINERLAB_VERSION }}" == "${{ steps.containerlab.outputs.CONTAINERLAB_VERSION }}" ]]; then
-            # Increment the WSL version
-            if [[ "${{ steps.current_release.outputs.CURRENT_WSL_VERSION }}" != "none" ]]; then
-              CURRENT_WSL_VERSION="${{ steps.current_release.outputs.CURRENT_WSL_VERSION }}"
-              # Extract major and minor version parts
-              WSL_MAJOR=$(echo $CURRENT_WSL_VERSION | cut -d'.' -f1)
-              WSL_MINOR=$(echo $CURRENT_WSL_VERSION | cut -d'.' -f2)
-              # Increment minor version
-              NEW_WSL_MINOR=$((WSL_MINOR + 1))
-              NEW_WSL_VERSION="$WSL_MAJOR.$NEW_WSL_MINOR"
-            fi
-            echo "Using existing containerlab version with incremented WSL version: $NEW_WSL_VERSION"
-          fi
+          echo "NEED_RELEASE=$need_release" >> "$GITHUB_OUTPUT"
 
-          # Set output variables
-          echo "NEED_RELEASE=$NEED_RELEASE" >> $GITHUB_OUTPUT
-          echo "NEW_TAG=${{ steps.containerlab.outputs.CONTAINERLAB_VERSION }}-$NEW_WSL_VERSION" >> $GITHUB_OUTPUT
-
-          if [[ "$NEED_RELEASE" == "true" ]]; then
-            echo "Release needed: ${{ steps.containerlab.outputs.CONTAINERLAB_VERSION }}-$NEW_WSL_VERSION"
+          if [[ "$need_release" == "true" ]]; then
+            new_tag="${new_clab}-${new_wsl}"
+            echo "NEW_TAG=$new_tag" >> "$GITHUB_OUTPUT"
+            echo "Releasing $new_tag"
           else
-            echo "No release needed. Latest containerlab version already supported."
+            echo "No release required"
           fi
 
-      - name: Create Release Tag
-        if: steps.release.outputs.NEED_RELEASE == 'true'
+      - name: Create Git tag
+        if: steps.decide.outputs.NEED_RELEASE == 'true'
         run: |
           git config --local user.email "github-actions@github.com"
-          git config --local user.name "GitHub Actions"
-          git tag -a ${{ steps.release.outputs.NEW_TAG }} -m "Release ${{ steps.release.outputs.NEW_TAG }}"
-          git push origin ${{ steps.release.outputs.NEW_TAG }}
+          git config --local user.name  "GitHub Actions"
+          git tag -a "${{ steps.decide.outputs.NEW_TAG }}" \
+            -m "Release ${{ steps.decide.outputs.NEW_TAG }}"
+          git push origin "${{ steps.decide.outputs.NEW_TAG }}"
 
-      - name: Create GitHub Release
-        if: steps.release.outputs.NEED_RELEASE == 'true'
+      - name: Draft GitHub Release
+        if: steps.decide.outputs.NEED_RELEASE == 'true'
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ steps.release.outputs.NEW_TAG }}
-          name: "Release ${{ steps.release.outputs.NEW_TAG }}"
+          tag_name: ${{ steps.decide.outputs.NEW_TAG }}
+          name: "Release ${{ steps.decide.outputs.NEW_TAG }}"
           body: |
-            WSL2 image for containerlab version ${{ steps.containerlab.outputs.CONTAINERLAB_VERSION }}
-            
-            ${{ github.event_name == 'workflow_dispatch' && 'This release was manually triggered.' || 'This release was automatically generated based on the latest containerlab release.' }}
+            WSL2 image for Containerlab ${{ steps.clab.outputs.CONTAINERLAB_VER }}
+
+            ${{ github.event_name == 'workflow_dispatch' && 'Manually triggered.' || 'Automated nightly release.' }}
           draft: false
           prerelease: false
 
-  # This job runs when triggered by a release event (manual release)
-  build-and-publish-from-release:
+# ------------------------------------------------------------
+# 2. Build & upload WSL image when we *have* a tag
+# ------------------------------------------------------------
+  build-and-publish:
+    needs: check-and-release
+    if: needs.check-and-release.outputs.NEED_RELEASE == 'true' || github.event_name == 'release'
     runs-on: ubuntu-22.04
-    if: github.event_name == 'release'
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-buildx-action@v2
 
-      - name: Build Docker Image
+      - name: Build Docker image
+        run: docker build . -t clab-wsl-debian
+
+      - name: Export container filesystem ➜ .wsl
         run: |
-          docker build . --tag clab-wsl-debian
-
-      - name: Run Docker Container and Export Filesystem
-        run: |
-          # Run the Docker container
           docker run -t --name wsl_export clab-wsl-debian ls /
-          # Export the container's filesystem to a tar file
-          docker export wsl_export -o clab.tar
-          # Remove the container to clean up
-          docker rm wsl_export
+          docker export  wsl_export -o clab.tar
+          docker rm      wsl_export
+          mv clab.tar    clab.wsl
 
-      - name: Rename tar to .wsl file
-        run: |
-          # Rename the tar file to have a .wsl extension
-          mv clab.tar clab.wsl
-
-      - name: Upload WSL Image Artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: clab-wsl2
           path: clab.wsl
 
-      - name: Get release tag
-        id: get_tag
+      - name: Determine tag name
+        id: tag
         run: |
-          # For releases triggered by the release event
-          REF_NAME="${{ github.ref }}"
-          TAG="${REF_NAME#refs/tags/}"
-          echo "Using release tag: $TAG"
-          echo "TAG=$TAG" >> $GITHUB_OUTPUT
+          if [[ "${{ github.event_name }}" == "release" ]]; then
+            echo "TAG=${GITHUB_REF##*/}" >> "$GITHUB_OUTPUT"
+          else
+            echo "TAG=${{ needs.check-and-release.outputs.NEW_TAG }}" >> "$GITHUB_OUTPUT"
+          fi
 
-      - name: Upload Release Asset
+      - name: Upload release asset
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: clab.wsl
-          asset_name: clab-${{ steps.get_tag.outputs.TAG }}.wsl
-          tag: ${{ steps.get_tag.outputs.TAG }}
-
-  # This job runs when triggered by a schedule or workflow_dispatch event and a release is needed
-  build-and-publish-from-check:
-    runs-on: ubuntu-22.04
-    needs: [check-and-release]
-    if: needs.check-and-release.outputs.NEED_RELEASE == 'true'
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Build Docker Image
-        run: |
-          docker build . --tag clab-wsl-debian
-
-      - name: Run Docker Container and Export Filesystem
-        run: |
-          # Run the Docker container
-          docker run -t --name wsl_export clab-wsl-debian ls /
-          # Export the container's filesystem to a tar file
-          docker export wsl_export -o clab.tar
-          # Remove the container to clean up
-          docker rm wsl_export
-
-      - name: Rename tar to .wsl file
-        run: |
-          # Rename the tar file to have a .wsl extension
-          mv clab.tar clab.wsl
-
-      - name: Upload WSL Image Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: clab-wsl2
-          path: clab.wsl
-
-      - name: Get release tag
-        id: get_tag
-        run: |
-          # For releases created by the check-and-release job
-          echo "Using new tag: ${{ needs.check-and-release.outputs.NEW_TAG }}"
-          echo "TAG=${{ needs.check-and-release.outputs.NEW_TAG }}" >> $GITHUB_OUTPUT
-
-      - name: Upload Release Asset
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: clab.wsl
-          asset_name: clab-${{ steps.get_tag.outputs.TAG }}.wsl
-          tag: ${{ steps.get_tag.outputs.TAG }}
+          asset_name: clab-${{ steps.tag.outputs.TAG }}.wsl
+          tag: ${{ steps.tag.outputs.TAG }}
