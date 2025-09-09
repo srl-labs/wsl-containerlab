@@ -128,6 +128,11 @@ source $ZSH/oh-my-zsh.sh
 export PATH="$HOME/.atuin/bin:$PATH"
 eval "$(atuin init zsh)"
 
+# Common aliases
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+
 # pyenv
 export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"

@@ -26,3 +26,8 @@ source "$ZSH/oh-my-zsh.sh"
 
 # 6. Load Powerlevel10k configuration if available.
 [[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
+
+# Common aliases
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
