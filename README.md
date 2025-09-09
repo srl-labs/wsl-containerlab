@@ -154,7 +154,7 @@ Windows version: 10.0.19044.5131
 > [!IMPORTANT]
 > This feature is only supported on Windows 11.
 
-You can run [vrnetlab (VM-based)](https://github.com/hellt/vrnetlab) nodes on
+You can run [vrnetlab (VM-based)](https://github.com/srl-labs/vrnetlab) nodes on
 top of WSL2 and use them in containerlab. Containerlab WSL is already configured
 so that nested virtualization is enabled on the distro side.
 
